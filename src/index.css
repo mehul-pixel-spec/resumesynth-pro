@@ -759,3 +759,53 @@ body.light,
 .light [role="dialog"] .text-slate-400 {
   color: #64748b !important;
 }
+
+/* 14. Dedicated Studio Modals (Light Mode) */
+.light .jd-modal-surface,
+.light .resume-modal-surface {
+  background-color: #ffffff !important;
+  border: 1px solid #cbd5e1 !important;
+  color: #0f172a !important;
+}
+
+.light .jd-modal-surface .bg-black\/40,
+.light .jd-modal-surface .bg-black\/20,
+.light .resume-modal-surface .bg-black\/40,
+.light .resume-modal-surface .bg-black\/20 {
+  background-color: #f8fafc !important;
+  border-color: #e2e8f0 !important;
+}
+
+.light .jd-modal-textarea,
+.light .resume-modal-textarea {
+  background-color: #ffffff !important;
+  border: 1px solid #cbd5e1 !important;
+  color: #0f172a !important;
+}
+
+.light .jd-modal-textarea:focus {
+  border-color: #2563eb !important;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12) !important;
+}
+
+.light .resume-modal-textarea:focus {
+  border-color: #0891b2 !important;
+  box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.12) !important;
+}
+
+/* 15. Enhanced Signal Graph (Light Mode) */
+.light .signal-canvas-bg {
+  background-color: #f8fafc !important;
+  border-color: #e2e8f0 !important;
+}
+
+.light .signal-inspector-card {
+  background-color: #f0fdf4 !important;
+  border-color: #bbf7d0 !important;
+}
+
+.light .signal-inspector-card p,
+.light .signal-inspector-card span {
+  color: #1e293b !important;
+}
+

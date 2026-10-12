@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
-import { Upload, X, FileCheck, ArrowRight, AlertCircle } from 'lucide-react';
+import { Upload, X, FileCheck, ArrowRight, AlertCircle, Maximize2, ExternalLink, Sparkles } from 'lucide-react';
 import { countWords, countBullets } from '../utils/atsEngine';
+import { JobDescriptionModal } from './JobDescriptionModal';
+import { ResumeEditorModal } from './ResumeEditorModal';
 
 interface InputWorkspaceProps {
   jobDescription: string;
@@ -24,6 +26,8 @@ export const InputWorkspace: React.FC<InputWorkspaceProps> = ({
   const [isDragging, setIsDragging] = useState(false);
   const [stagedFile, setStagedFile] = useState<File | null>(null);
   const [fileError, setFileError] = useState<string | null>(null);
+  const [isJdModalOpen, setIsJdModalOpen] = useState(false);
+  const [isResumeModalOpen, setIsResumeModalOpen] = useState(false);
 
   const jdWords = countWords(jobDescription);
   const resumeWords = countWords(resumeText);
@@ -63,11 +67,11 @@ export const InputWorkspace: React.FC<InputWorkspaceProps> = ({
       {/* 2-Column Input Cards */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
         {/* Step 1: Job Description */}
-        <div className="rounded-2xl border border-white/[0.12] bg-slate-900/75 backdrop-blur-xl shadow-xl overflow-hidden flex flex-col justify-between">
+        <div className="rounded-2xl border border-white/[0.12] bg-slate-900/75 backdrop-blur-xl shadow-xl overflow-hidden flex flex-col justify-between group">
           <div className="p-5 border-b border-white/[0.1] flex items-center justify-between">
             <div className="flex items-center gap-3">
               <span
-                className="w-7 h-7 rounded-lg bg-lime-400/20 text-lime-300 font-mono text-xs font-bold flex items-center justify-center border border-lime-400/40"
+                className="w-7 h-7 rounded-lg bg-blue-500/20 text-blue-400 font-mono text-xs font-bold flex items-center justify-center border border-blue-500/40"
                 aria-hidden="true"
               >
                 01
@@ -81,15 +85,43 @@ export const InputWorkspace: React.FC<InputWorkspaceProps> = ({
                 </p>
               </div>
             </div>
-            <span
-              className="font-mono text-xs text-slate-300 bg-black/50 px-3 py-1 rounded-md border border-white/[0.1]"
-              aria-live="polite"
-            >
-              {jdWords} words
-            </span>
+
+            <div className="flex items-center gap-2">
+              <span
+                className="hidden sm:inline-flex font-mono text-xs text-slate-300 bg-black/50 px-2.5 py-1 rounded-md border border-white/[0.1]"
+                aria-live="polite"
+              >
+                {jdWords} words
+              </span>
+
+              {/* Dedicated Interface Trigger Button */}
+              <button
+                type="button"
+                onClick={() => setIsJdModalOpen(true)}
+                className="px-3 py-1.5 rounded-xl border border-blue-500/30 bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 hover:text-blue-300 text-xs font-bold transition flex items-center gap-1.5 cursor-pointer shadow-xs active:scale-95"
+                title="Open separate full-screen Job Description Studio"
+                aria-label="Open separate full-screen Job Description Studio"
+              >
+                <Maximize2 className="w-3.5 h-3.5" aria-hidden="true" />
+                <span>Dedicated Studio</span>
+              </button>
+            </div>
           </div>
 
           <div className="p-5 space-y-3">
+            {/* Quick Click-to-open notice */}
+            <div
+              onClick={() => setIsJdModalOpen(true)}
+              className="px-3 py-2 rounded-xl border border-blue-500/20 bg-blue-500/[0.06] hover:bg-blue-500/[0.12] text-xs text-blue-300 flex items-center justify-between cursor-pointer transition"
+              title="Click to open separate full-screen interface"
+            >
+              <span className="flex items-center gap-2">
+                <Sparkles className="w-3.5 h-3.5 text-blue-400" />
+                <span>Need focused editing? Click to open full Job Description interface</span>
+              </span>
+              <ExternalLink className="w-3.5 h-3.5 text-blue-400 shrink-0" />
+            </div>
+
             <label htmlFor="jd-textarea" className="sr-only">
               Job Description Text
             </label>
@@ -98,28 +130,37 @@ export const InputWorkspace: React.FC<InputWorkspaceProps> = ({
               value={jobDescription}
               onChange={(e) => onJobDescriptionChange(e.target.value)}
               aria-describedby="jd-desc"
-              placeholder="Paste target job posting or requirements here..."
-              className="w-full min-h-[200px] p-4 rounded-xl bg-black/60 border border-white/15 text-sm sm:text-xs text-slate-100 font-mono leading-relaxed focus:outline-none focus:border-lime-400 focus:ring-1 focus:ring-lime-400 resize-y"
+              placeholder="Paste target job posting or requirements here, or click Dedicated Studio above..."
+              className="w-full min-h-[200px] p-4 rounded-xl bg-black/60 border border-white/15 text-sm sm:text-xs text-slate-100 font-mono leading-relaxed focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-400 resize-y"
             />
 
             <div className="flex items-center justify-between text-xs text-slate-300">
-              <span>Paste requirements or bullet points for highest scoring accuracy.</span>
-              {jobDescription.length > 0 && (
+              <span>{jdWords > 0 ? `${jdWords} words analyzed` : 'Paste requirements or bullet points for highest scoring accuracy.'}</span>
+              <div className="flex items-center gap-2">
                 <button
                   type="button"
-                  onClick={() => onJobDescriptionChange('')}
-                  className="min-h-[44px] min-w-[44px] text-slate-400 hover:text-white transition font-medium cursor-pointer"
-                  aria-label="Clear job description text"
+                  onClick={() => setIsJdModalOpen(true)}
+                  className="text-blue-400 hover:text-blue-300 font-semibold cursor-pointer underline underline-offset-2"
                 >
-                  Clear
+                  Full Editor
                 </button>
-              )}
+                {jobDescription.length > 0 && (
+                  <button
+                    type="button"
+                    onClick={() => onJobDescriptionChange('')}
+                    className="min-h-[36px] px-2 text-slate-400 hover:text-white transition font-medium cursor-pointer"
+                    aria-label="Clear job description text"
+                  >
+                    Clear
+                  </button>
+                )}
+              </div>
             </div>
           </div>
         </div>
 
         {/* Step 2: Resume Evidence */}
-        <div className="rounded-2xl border border-white/[0.12] bg-slate-900/75 backdrop-blur-xl shadow-xl overflow-hidden flex flex-col justify-between">
+        <div className="rounded-2xl border border-white/[0.12] bg-slate-900/75 backdrop-blur-xl shadow-xl overflow-hidden flex flex-col justify-between group">
           <div className="p-5 border-b border-white/[0.1] flex items-center justify-between">
             <div className="flex items-center gap-3">
               <span
@@ -137,17 +178,45 @@ export const InputWorkspace: React.FC<InputWorkspaceProps> = ({
                 </p>
               </div>
             </div>
-            <div
-              className="flex items-center gap-2 font-mono text-xs text-slate-300 bg-black/50 px-3 py-1 rounded-md border border-white/[0.1]"
-              aria-live="polite"
-            >
-              <span>{resumeBullets} bullets</span>
-              <span>•</span>
-              <span>{resumeWords} words</span>
+
+            <div className="flex items-center gap-2">
+              <div
+                className="hidden sm:flex items-center gap-2 font-mono text-xs text-slate-300 bg-black/50 px-2.5 py-1 rounded-md border border-white/[0.1]"
+                aria-live="polite"
+              >
+                <span>{resumeBullets} bullets</span>
+                <span>•</span>
+                <span>{resumeWords} words</span>
+              </div>
+
+              {/* Dedicated Interface Trigger Button */}
+              <button
+                type="button"
+                onClick={() => setIsResumeModalOpen(true)}
+                className="px-3 py-1.5 rounded-xl border border-cyan-400/30 bg-cyan-400/10 hover:bg-cyan-400/20 text-cyan-300 hover:text-cyan-200 text-xs font-bold transition flex items-center gap-1.5 cursor-pointer shadow-xs active:scale-95"
+                title="Open separate full-screen Resume Studio"
+                aria-label="Open separate full-screen Resume Studio"
+              >
+                <Maximize2 className="w-3.5 h-3.5" aria-hidden="true" />
+                <span>Dedicated Studio</span>
+              </button>
             </div>
           </div>
 
           <div className="p-5 space-y-3">
+            {/* Quick Click-to-open notice */}
+            <div
+              onClick={() => setIsResumeModalOpen(true)}
+              className="px-3 py-2 rounded-xl border border-cyan-400/20 bg-cyan-400/[0.06] hover:bg-cyan-400/[0.12] text-xs text-cyan-300 flex items-center justify-between cursor-pointer transition"
+              title="Click to open separate full-screen interface"
+            >
+              <span className="flex items-center gap-2">
+                <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
+                <span>Want section starters & STAR templates? Click to open full Resume interface</span>
+              </span>
+              <ExternalLink className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
+            </div>
+
             <label htmlFor="resume-textarea" className="sr-only">
               Resume Evidence Text
             </label>
@@ -156,22 +225,31 @@ export const InputWorkspace: React.FC<InputWorkspaceProps> = ({
               value={resumeText}
               onChange={(e) => onResumeChange(e.target.value)}
               aria-describedby="resume-desc"
-              placeholder="Paste your current resume bullets or full text..."
+              placeholder="Paste your current resume bullets or full text, or click Dedicated Studio above..."
               className="w-full min-h-[200px] p-4 rounded-xl bg-black/60 border border-white/15 text-sm sm:text-xs text-slate-100 font-mono leading-relaxed focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 resize-y"
             />
 
             <div className="flex items-center justify-between text-xs text-slate-300">
               <span className="text-cyan-300 font-semibold">✓ Markdown & plain text supported</span>
-              {resumeText.length > 0 && (
+              <div className="flex items-center gap-2">
                 <button
                   type="button"
-                  onClick={() => onResumeChange('')}
-                  className="min-h-[44px] min-w-[44px] text-slate-400 hover:text-white transition font-medium cursor-pointer"
-                  aria-label="Clear resume text"
+                  onClick={() => setIsResumeModalOpen(true)}
+                  className="text-cyan-300 hover:text-cyan-200 font-semibold cursor-pointer underline underline-offset-2"
                 >
-                  Clear
+                  Full Editor
                 </button>
-              )}
+                {resumeText.length > 0 && (
+                  <button
+                    type="button"
+                    onClick={() => onResumeChange('')}
+                    className="min-h-[36px] px-2 text-slate-400 hover:text-white transition font-medium cursor-pointer"
+                    aria-label="Clear resume text"
+                  >
+                    Clear
+                  </button>
+                )}
+              </div>
             </div>
           </div>
         </div>
@@ -313,6 +391,22 @@ export const InputWorkspace: React.FC<InputWorkspaceProps> = ({
           )}
         </button>
       </div>
+
+      {/* Dedicated Separate Interface for Job Description */}
+      <JobDescriptionModal
+        isOpen={isJdModalOpen}
+        onClose={() => setIsJdModalOpen(false)}
+        jobDescription={jobDescription}
+        onSave={(val) => onJobDescriptionChange(val)}
+      />
+
+      {/* Dedicated Separate Interface for Resume Text */}
+      <ResumeEditorModal
+        isOpen={isResumeModalOpen}
+        onClose={() => setIsResumeModalOpen(false)}
+        resumeText={resumeText}
+        onSave={(val) => onResumeChange(val)}
+      />
     </section>
   );
 };
