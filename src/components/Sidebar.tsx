@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { LayoutDashboard, FileText, BarChart2, Wand2, Edit3, Briefcase, HelpCircle, ShieldCheck, X } from 'lucide-react';
+import { LayoutDashboard, FileText, BarChart2, Wand2, Edit3, Briefcase, HelpCircle, ShieldCheck, PanelLeftClose } from 'lucide-react';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -42,7 +42,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       {isOpen && (
         <div
           onClick={onClose}
-          className="fixed inset-0 z-40 bg-black/80 backdrop-blur-sm lg:hidden transition-opacity"
+          className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm lg:hidden transition-opacity"
           aria-hidden="true"
         />
       )}
@@ -51,29 +51,30 @@ export const Sidebar: React.FC<SidebarProps> = ({
         id="sidebar-navigation"
         role="navigation"
         aria-label="Section Navigation"
-        className={`fixed top-0 bottom-0 left-0 z-50 w-64 border-r border-white/[0.1] bg-[#060a14] p-5 flex flex-col justify-between transition-transform duration-300 ease-in-out lg:translate-x-0 ${
-          isOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full'
+        className={`fixed top-0 bottom-0 left-0 z-50 w-64 border-r border-white/[0.1] bg-[#060a14] p-5 flex flex-col justify-between transition-transform duration-300 ease-in-out ${
+          isOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full shadow-none pointer-events-none'
         }`}
       >
         <div>
           {/* Top Brand / Close */}
           <div className="flex items-center justify-between pb-6 border-b border-white/[0.1]">
             <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-lg bg-lime-400/20 border border-lime-400/40 flex items-center justify-center text-lime-300 font-bold" aria-hidden="true">
+              <div className="w-8 h-8 rounded-lg bg-lime-400/20 border border-lime-400/40 flex items-center justify-center text-lime-300 font-bold sidebar-brand-avatar" aria-hidden="true">
                 RS
               </div>
               <span className="font-display font-bold text-white tracking-tight">
-                Resume<span className="text-lime-300">Synth</span>
+                Resume<span className="text-lime-300 header-brand-accent">Synth</span>
               </span>
             </div>
 
             <button
               type="button"
               onClick={onClose}
-              className="lg:hidden min-h-[44px] min-w-[44px] p-2 rounded-xl text-slate-300 hover:text-white flex items-center justify-center cursor-pointer"
-              aria-label="Close navigation menu"
+              className="sidebar-close-btn min-h-[40px] min-w-[40px] p-2 rounded-xl text-slate-300 hover:text-white hover:bg-white/10 flex items-center justify-center cursor-pointer transition active:scale-95"
+              aria-label="Close sidebar menu (Enlarge view) [Shortcut: [ or Esc]"
+              title="Close sidebar (Enlarge view) — Shortcut: [ or Esc"
             >
-              <X className="w-5 h-5" aria-hidden="true" />
+              <PanelLeftClose className="w-5 h-5" aria-hidden="true" />
             </button>
           </div>
 

@@ -46,7 +46,57 @@ export const App: React.FC = () => {
     }
   }, [isDark]);
 
-  const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
+  // Unified Sidebar state with persistence and default open on desktop
+  const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('resumesynth_sidebar');
+      if (saved !== null) return saved === 'true';
+      return window.innerWidth >= 1024;
+    }
+    return true;
+  });
+
+  useEffect(() => {
+    localStorage.setItem('resumesynth_sidebar', String(isSidebarOpen));
+  }, [isSidebarOpen]);
+
+  const handleToggleSidebar = () => {
+    setIsSidebarOpen(prev => {
+      const next = !prev;
+      showToast(next ? 'Sidebar opened · Normal view' : 'Sidebar closed · Enlarged view');
+      return next;
+    });
+  };
+
+  // Keyboard shortcut listener for opening/closing sidebar: '[' or Ctrl+B / Cmd+B or '\'
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement;
+      const isInput = target && (
+        target.tagName === 'INPUT' ||
+        target.tagName === 'TEXTAREA' ||
+        target.tagName === 'SELECT' ||
+        target.isContentEditable
+      );
+
+      // Support:
+      // 1. Bracket '[' key (when not typing in inputs)
+      // 2. Ctrl+B / Cmd+B (universal sidebar shortcut)
+      // 3. Backslash '\' (when not typing in inputs)
+      if (
+        (e.key === '[' && !isInput && !e.ctrlKey && !e.metaKey && !e.altKey) ||
+        ((e.ctrlKey || e.metaKey) && (e.key.toLowerCase() === 'b' || e.code === 'KeyB') && !e.shiftKey) ||
+        (e.key === '\\' && !isInput && !e.ctrlKey && !e.metaKey && !e.altKey)
+      ) {
+        e.preventDefault();
+        handleToggleSidebar();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
   const [activeSection, setActiveSection] = useState('dashboard');
   const [showHowItWorks, setShowHowItWorks] = useState(false);
   const [showExportModal, setShowExportModal] = useState(false);
@@ -174,15 +224,19 @@ export const App: React.FC = () => {
         onReset={handleReset}
         onOpenExport={() => setShowExportModal(true)}
         onToggleHowItWorks={() => setShowHowItWorks(v => !v)}
-        onToggleMobileNav={() => setIsMobileNavOpen(true)}
+        onToggleSidebar={handleToggleSidebar}
+        isSidebarOpen={isSidebarOpen}
         isDark={isDark}
         onToggleTheme={handleToggleTheme}
       />
 
       {/* Sidebar Navigation */}
       <Sidebar
-        isOpen={isMobileNavOpen}
-        onClose={() => setIsMobileNavOpen(false)}
+        isOpen={isSidebarOpen}
+        onClose={() => {
+          setIsSidebarOpen(false);
+          showToast('Sidebar closed · Enlarged view');
+        }}
         activeSection={activeSection}
         onNavigate={handleNavigate}
       />
@@ -201,9 +255,21 @@ export const App: React.FC = () => {
         )}
       </div>
 
-      {/* Semantic Main Content */}
-      <main id="main-content" role="main" className="lg:pl-64">
-        <div className="mx-auto max-w-[1440px] px-4 sm:px-8 py-8 lg:py-10 space-y-12">
+      {/* Semantic Main Content: Enlarges dynamically when sidebar is closed */}
+      <main
+        id="main-content"
+        role="main"
+        className={`transition-all duration-300 ease-in-out ${
+          isSidebarOpen ? 'lg:pl-64' : 'pl-0'
+        }`}
+      >
+        <div
+          className={`mx-auto py-8 lg:py-10 space-y-12 transition-all duration-300 ease-in-out ${
+            isSidebarOpen
+              ? 'max-w-[1440px] px-4 sm:px-8'
+              : 'max-w-[1880px] px-6 sm:px-12 lg:px-16 enlarged-workspace'
+          }`}
+        >
           {/* Section 1: Hero & Role Presets */}
           <div id="dashboard">
             <HeroSection

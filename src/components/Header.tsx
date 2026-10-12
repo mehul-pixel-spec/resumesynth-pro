@@ -1,11 +1,12 @@
 import React from 'react';
-import { Sparkles, RefreshCw, Sun, Moon, Download, Menu, ShieldCheck } from 'lucide-react';
+import { Sparkles, RefreshCw, Sun, Moon, Download, Menu, ShieldCheck, PanelLeftClose, PanelLeftOpen } from 'lucide-react';
 
 interface HeaderProps {
   onReset: () => void;
   onOpenExport: () => void;
   onToggleHowItWorks: () => void;
-  onToggleMobileNav: () => void;
+  onToggleSidebar: () => void;
+  isSidebarOpen: boolean;
   isDark: boolean;
   onToggleTheme: () => void;
 }
@@ -14,7 +15,8 @@ export const Header: React.FC<HeaderProps> = ({
   onReset,
   onOpenExport,
   onToggleHowItWorks,
-  onToggleMobileNav,
+  onToggleSidebar,
+  isSidebarOpen,
   isDark,
   onToggleTheme
 }) => {
@@ -32,15 +34,26 @@ export const Header: React.FC<HeaderProps> = ({
         role="banner"
         className="sticky top-0 z-40 border-b border-white/[0.12] bg-[#070c18]/90 backdrop-blur-xl transition-colors"
       >
-        <div className="mx-auto flex max-w-[1440px] items-center justify-between px-4 py-3 sm:px-8">
-          {/* Left: Mobile Nav Toggle & Logo */}
+        <div className={`mx-auto flex items-center justify-between py-3 transition-all duration-300 ease-in-out ${
+          isSidebarOpen ? 'max-w-[1440px] px-4 sm:px-8' : 'max-w-[1880px] px-6 sm:px-12 lg:px-16'
+        }`}>
+          {/* Left: Sidebar Toggle Key & Logo */}
           <div className="flex items-center gap-3">
             <button
-              onClick={onToggleMobileNav}
-              className="lg:hidden min-h-[44px] min-w-[44px] p-2.5 rounded-xl bg-white/[0.06] border border-white/10 text-slate-200 hover:text-white flex items-center justify-center cursor-pointer transition active:scale-95"
-              aria-label="Open navigation menu"
+              type="button"
+              onClick={onToggleSidebar}
+              className="sidebar-toggle-btn min-h-[44px] min-w-[44px] px-2.5 py-2 rounded-xl bg-white/[0.06] border border-white/10 text-slate-200 hover:text-white hover:bg-white/[0.12] flex items-center justify-center cursor-pointer transition active:scale-95 gap-1.5 group"
+              aria-label={isSidebarOpen ? "Close sidebar menu (Enlarge view) [Shortcut: [ or Ctrl+B]" : "Open sidebar menu (Normal view) [Shortcut: [ or Ctrl+B]"}
+              title={isSidebarOpen ? "Close sidebar (Enlarge view) — Shortcut: [ or Ctrl+B" : "Open sidebar (Normal view) — Shortcut: [ or Ctrl+B"}
             >
-              <Menu className="w-5 h-5" aria-hidden="true" />
+              {isSidebarOpen ? (
+                <PanelLeftClose className="w-5 h-5 transition group-hover:-translate-x-0.5 text-slate-300" aria-hidden="true" />
+              ) : (
+                <PanelLeftOpen className="w-5 h-5 transition group-hover:translate-x-0.5 text-slate-300" aria-hidden="true" />
+              )}
+              <span className="hidden xl:inline text-[10px] font-mono text-slate-400 bg-white/10 px-1.5 py-0.5 rounded font-semibold shortcut-hint">
+                [
+              </span>
             </button>
 
             <div className="flex items-center gap-3">

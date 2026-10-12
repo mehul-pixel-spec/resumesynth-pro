@@ -157,6 +157,7 @@ body.light,
 
 /* Header Action Buttons (Light Mode) */
 .light header .theme-toggle-btn,
+.light header .sidebar-toggle-btn,
 .light header button[title*="Reset"],
 .light header button[aria-label="Open navigation menu"] {
   background-color: #ffffff !important;
@@ -166,11 +167,18 @@ body.light,
 }
 
 .light header .theme-toggle-btn:hover,
+.light header .sidebar-toggle-btn:hover,
 .light header button[title*="Reset"]:hover,
 .light header button[aria-label="Open navigation menu"]:hover {
   background-color: #f8fafc !important;
   border-color: #94a3b8 !important;
   color: #0f172a !important;
+}
+
+.light .shortcut-hint {
+  background-color: #f1f5f9 !important;
+  color: #64748b !important;
+  border: 1px solid #e2e8f0 !important;
 }
 
 .light .header-export-btn {
@@ -208,6 +216,21 @@ body.light,
   color: #0f172a !important;
 }
 
+.light #sidebar-navigation .sidebar-close-btn {
+  color: #64748b !important;
+}
+
+.light #sidebar-navigation .sidebar-close-btn:hover {
+  background-color: #f1f5f9 !important;
+  color: #0f172a !important;
+}
+
+.light .sidebar-brand-avatar {
+  background-color: #eff6ff !important;
+  border-color: #bfdbfe !important;
+  color: #1d4ed8 !important;
+}
+
 .light #sidebar-navigation button.bg-lime-400\/20 {
   background-color: #eff6ff !important;
   border: 1px solid #bfdbfe !important;
@@ -229,6 +252,20 @@ body.light,
 .light #sidebar-navigation .bg-black\/50 span,
 .light #sidebar-navigation .bg-white\/\[0\.04\] span {
   color: #0f172a !important;
+}
+
+/* Enlarged Panoramic Workspace Mode (When Sidebar is Closed) */
+.enlarged-workspace {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@media (min-width: 1024px) {
+  .enlarged-workspace #markdown-editor-pane {
+    min-height: 540px;
+  }
+  .enlarged-workspace #printable-resume {
+    min-height: 540px;
+  }
 }
 
 /* 3. Hero Section (Light Mode) */
