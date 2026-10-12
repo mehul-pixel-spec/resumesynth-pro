@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { PRESETS } from './data/presets';
 import { runAtsAnalysis, detectQualityIssues, generateInterviewQuestions } from './utils/atsEngine';
 import { JobApplication, TailorMode, QualityIssue } from './types';
@@ -21,8 +21,31 @@ import { ExportModal } from './components/ExportModal';
 import { Sparkles, ShieldCheck, Sliders } from 'lucide-react';
 
 export const App: React.FC = () => {
-  // Theme & Layout state
-  const [isDark, setIsDark] = useState(true);
+  // Theme & Layout state with localStorage persistence
+  const [isDark, setIsDark] = useState<boolean>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('resumesynth_theme');
+      if (saved) return saved === 'dark';
+      return window.matchMedia('(prefers-color-scheme: dark)').matches;
+    }
+    return true;
+  });
+
+  useEffect(() => {
+    localStorage.setItem('resumesynth_theme', isDark ? 'dark' : 'light');
+    if (isDark) {
+      document.documentElement.classList.add('dark');
+      document.documentElement.classList.remove('light');
+      document.body.classList.add('dark');
+      document.body.classList.remove('light');
+    } else {
+      document.documentElement.classList.add('light');
+      document.documentElement.classList.remove('dark');
+      document.body.classList.add('light');
+      document.body.classList.remove('dark');
+    }
+  }, [isDark]);
+
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
   const [activeSection, setActiveSection] = useState('dashboard');
   const [showHowItWorks, setShowHowItWorks] = useState(false);
@@ -128,8 +151,16 @@ export const App: React.FC = () => {
     }
   };
 
+  const handleToggleTheme = () => {
+    setIsDark(prev => {
+      const next = !prev;
+      showToast(`Switched to ${next ? 'Dark' : 'Light'} Mode`);
+      return next;
+    });
+  };
+
   return (
-    <div className={`min-h-screen bg-[#070c18] text-slate-100 font-sans selection:bg-lime-400 selection:text-slate-950`}>
+    <div className={`min-h-screen ${isDark ? 'dark bg-[#070c18] text-slate-100' : 'light bg-slate-50 text-slate-900'} font-sans selection:bg-lime-400 selection:text-slate-950 transition-colors duration-200`}>
       {/* Ambient background glow orbs */}
       <div className="fixed top-0 left-1/4 w-[600px] h-[600px] bg-lime-400/[0.035] rounded-full blur-[140px] pointer-events-none" aria-hidden="true" />
       <div className="fixed bottom-0 right-1/4 w-[600px] h-[600px] bg-cyan-400/[0.035] rounded-full blur-[140px] pointer-events-none" aria-hidden="true" />
@@ -141,7 +172,7 @@ export const App: React.FC = () => {
         onToggleHowItWorks={() => setShowHowItWorks(v => !v)}
         onToggleMobileNav={() => setIsMobileNavOpen(true)}
         isDark={isDark}
-        onToggleTheme={() => setIsDark(!isDark)}
+        onToggleTheme={handleToggleTheme}
       />
 
       {/* Sidebar Navigation */}

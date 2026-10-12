@@ -94,7 +94,28 @@ export const Header: React.FC<HeaderProps> = ({
           </nav>
 
           {/* Right: Actions with 44px min tap targets */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3">
+            {/* Theme Toggle (Light / Dark Mode) */}
+            <button
+              type="button"
+              onClick={onToggleTheme}
+              className="theme-toggle-btn group min-h-[44px] min-w-[44px] px-3.5 py-2 rounded-xl border border-white/15 bg-white/[0.06] text-xs font-semibold text-slate-200 hover:border-white/30 hover:bg-white/[0.12] hover:text-white transition active:scale-95 cursor-pointer flex items-center gap-2"
+              title={isDark ? "Switch to Light Mode" : "Switch to Dark Mode"}
+              aria-label={isDark ? "Switch to Light Mode" : "Switch to Dark Mode"}
+            >
+              {isDark ? (
+                <>
+                  <Sun className="w-4 h-4 text-amber-300 transition-transform group-hover:rotate-45" aria-hidden="true" />
+                  <span className="hidden sm:inline">Light</span>
+                </>
+              ) : (
+                <>
+                  <Moon className="w-4 h-4 text-indigo-500 transition-transform group-hover:-rotate-12" aria-hidden="true" />
+                  <span className="hidden sm:inline">Dark</span>
+                </>
+              )}
+            </button>
+
             <button
               type="button"
               onClick={onReset}

@@ -64,6 +64,7 @@ export const ScoreRing: React.FC<ScoreRingProps> = ({
           fill="none"
           stroke="#1e293b"
           strokeWidth={strokeWidth}
+          className="score-track"
         />
         <circle
           cx={size / 2}

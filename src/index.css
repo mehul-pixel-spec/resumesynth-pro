@@ -78,3 +78,329 @@
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(255, 255, 255, 0.35);
 }
+
+/* ========================================================
+   LIGHT MODE THEME SYSTEM
+   ======================================================== */
+
+html.light,
+body.light,
+.light {
+  --bg-main: #f8fafc;
+  --text-main: #0f172a;
+  --text-muted: #64748b;
+  background-color: #f8fafc !important;
+  color: #0f172a !important;
+}
+
+/* Scrollbars in Light Mode */
+.light ::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.light ::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.18);
+}
+
+.light ::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.32);
+}
+
+/* 1. Header & Navigation in Light Mode */
+.light header[role="banner"] {
+  background-color: rgba(255, 255, 255, 0.94) !important;
+  border-bottom-color: #e2e8f0 !important;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+}
+
+.light header .font-display,
+.light header span.text-white {
+  color: #0f172a !important;
+}
+
+.light header nav a {
+  color: #475569 !important;
+}
+
+.light header nav a:hover {
+  color: #0f172a !important;
+}
+
+.light header nav button {
+  color: #475569 !important;
+}
+
+.light header nav button:hover {
+  color: #0f172a !important;
+}
+
+.light header .theme-toggle-btn,
+.light header button[title*="Reset"],
+.light header button[aria-label="Open navigation menu"] {
+  background-color: #f1f5f9 !important;
+  border-color: #cbd5e1 !important;
+  color: #1e293b !important;
+}
+
+.light header .theme-toggle-btn:hover,
+.light header button[title*="Reset"]:hover,
+.light header button[aria-label="Open navigation menu"]:hover {
+  background-color: #e2e8f0 !important;
+  border-color: #94a3b8 !important;
+  color: #0f172a !important;
+}
+
+/* 2. Sidebar Navigation in Light Mode */
+.light #sidebar-navigation {
+  background-color: #ffffff !important;
+  border-right-color: #e2e8f0 !important;
+  box-shadow: 2px 0 16px rgba(0, 0, 0, 0.05);
+}
+
+.light #sidebar-navigation .font-display,
+.light #sidebar-navigation h2,
+.light #sidebar-navigation h3 {
+  color: #0f172a !important;
+}
+
+.light #sidebar-navigation button {
+  color: #475569 !important;
+}
+
+.light #sidebar-navigation button:hover {
+  background-color: #f1f5f9 !important;
+  color: #0f172a !important;
+}
+
+.light #sidebar-navigation button.bg-lime-400\/20 {
+  background-color: #ecfccb !important;
+  border-color: #bef264 !important;
+  color: #365314 !important;
+}
+
+.light #sidebar-navigation .border-white\/10,
+.light #sidebar-navigation .border-white\/\[0\.1\] {
+  border-color: #e2e8f0 !important;
+}
+
+.light #sidebar-navigation .bg-black\/50,
+.light #sidebar-navigation .bg-white\/\[0\.04\] {
+  background-color: #f8fafc !important;
+  border-color: #e2e8f0 !important;
+  color: #64748b !important;
+}
+
+.light #sidebar-navigation .bg-black\/50 span,
+.light #sidebar-navigation .bg-white\/\[0\.04\] span {
+  color: #0f172a !important;
+}
+
+/* 3. Hero Section in Light Mode */
+.light #hero-title {
+  color: #0f172a !important;
+}
+
+.light #hero-title span {
+  color: #4d7c0f !important;
+  text-decoration-color: #84cc16 !important;
+}
+
+.light #dashboard p {
+  color: #475569 !important;
+}
+
+.light #dashboard aside[aria-label="Signal Legend"],
+.light #dashboard [role="region"][aria-label="How ResumeSynth Works"] {
+  background-color: #ffffff !important;
+  border-color: #e2e8f0 !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+}
+
+.light #dashboard aside[aria-label="Signal Legend"] div,
+.light #dashboard aside[aria-label="Signal Legend"] span {
+  color: #1e293b !important;
+}
+
+.light #dashboard .bg-white\/\[0\.04\],
+.light #dashboard .bg-white\/\[0\.03\],
+.light #dashboard .bg-black\/50 {
+  background-color: #f8fafc !important;
+  border-color: #e2e8f0 !important;
+  color: #1e293b !important;
+}
+
+.light #dashboard button.bg-white\/\[0\.06\] {
+  background-color: #f1f5f9 !important;
+  border-color: #cbd5e1 !important;
+  color: #334155 !important;
+}
+
+.light #dashboard button.bg-white\/\[0\.06\]:hover {
+  background-color: #e2e8f0 !important;
+  color: #0f172a !important;
+}
+
+.light #dashboard button.bg-lime-400\/25 {
+  background-color: #ecfccb !important;
+  border-color: #84cc16 !important;
+  color: #365314 !important;
+}
+
+/* 4. Common Container & Card Surfaces in Light Mode */
+.light article,
+.light section.rounded-2xl,
+.light div.rounded-2xl.border,
+.light section[id="my-resume"],
+.light section[id="ats-analysis"] > div.rounded-2xl {
+  background-color: #ffffff !important;
+  border-color: #e2e8f0 !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+}
+
+.light h1,
+.light h2,
+.light h3,
+.light h4,
+.light h5 {
+  color: #0f172a !important;
+}
+
+.light .text-slate-100,
+.light .text-slate-200,
+.light .text-white {
+  color: #1e293b !important;
+}
+
+.light .text-slate-300,
+.light .text-slate-400 {
+  color: #64748b !important;
+}
+
+.light .border-white\/10,
+.light .border-white\/15,
+.light .border-white\/20,
+.light .border-white\/\[0\.08\],
+.light .border-white\/\[0\.1\],
+.light .border-white\/\[0\.12\],
+.light .border-white\/\[0\.06\] {
+  border-color: #e2e8f0 !important;
+}
+
+.light .bg-black\/50,
+.light .bg-black\/60,
+.light .bg-black\/40 {
+  background-color: #f8fafc !important;
+  border-color: #e2e8f0 !important;
+}
+
+.light .bg-slate-900\/60,
+.light .bg-slate-900\/75,
+.light .bg-slate-900 {
+  background-color: #ffffff !important;
+  border-color: #e2e8f0 !important;
+}
+
+/* 5. Inputs, Textareas & Selects in Light Mode */
+.light textarea,
+.light select,
+.light input[type="text"] {
+  background-color: #f8fafc !important;
+  border-color: #cbd5e1 !important;
+  color: #0f172a !important;
+}
+
+.light textarea:focus,
+.light select:focus,
+.light input[type="text"]:focus {
+  background-color: #ffffff !important;
+  border-color: #06b6d4 !important;
+}
+
+.light textarea::placeholder,
+.light input::placeholder {
+  color: #94a3b8 !important;
+}
+
+/* 6. ScoreRing & SignalGraph in Light Mode */
+.light circle.score-track,
+.light circle[stroke="#1e293b"] {
+  stroke: #e2e8f0 !important;
+}
+
+.light .bg-\[\#060a14\]\/90 {
+  background-color: #f8fafc !important;
+}
+
+/* 7. Vocabulary Gap Map in Light Mode */
+.light #gap-map-heading ~ div,
+.light [aria-labelledby="gap-map-heading"] .bg-black\/50 {
+  background-color: #f1f5f9 !important;
+}
+
+.light .bg-rose-400\/10,
+.light .bg-rose-400\/15,
+.light .bg-rose-400\/20 {
+  background-color: #fff1f2 !important;
+  border-color: #fecdd3 !important;
+  color: #be123c !important;
+}
+
+.light .text-rose-300,
+.light .text-rose-200 {
+  color: #be123c !important;
+}
+
+/* 8. Star Bullet Rewriter in Light Mode */
+.light #bullet-studio .bg-violet-400\/10,
+.light #bullet-studio .bg-violet-400\/15 {
+  background-color: #f5f3ff !important;
+  border-color: #ddd6fe !important;
+  color: #6d28d9 !important;
+}
+
+/* 9. Live ATS Resume Preview in Light Mode */
+.light #printable-resume.bg-slate-950 {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+  border-color: #e2e8f0 !important;
+}
+
+.light #printable-resume.bg-slate-950 h4 {
+  color: #0f172a !important;
+}
+
+.light #printable-resume.bg-slate-950 p {
+  color: #475569 !important;
+}
+
+.light #printable-resume.bg-slate-950 section h5 {
+  color: #0e7490 !important;
+  border-bottom-color: #cbd5e1 !important;
+}
+
+.light #printable-resume.bg-slate-950 li,
+.light #printable-resume.bg-slate-950 span {
+  color: #1e293b !important;
+}
+
+/* 10. Modals & Dialogs in Light Mode */
+.light [role="dialog"],
+.light [role="dialog"] > div.bg-slate-900 {
+  background-color: #ffffff !important;
+  border-color: #cbd5e1 !important;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25) !important;
+}
+
+.light [role="dialog"] .bg-black\/50 {
+  background-color: #f8fafc !important;
+  border-color: #e2e8f0 !important;
+}
+
+.light [role="dialog"] .text-white {
+  color: #0f172a !important;
+}
+
+.light [role="dialog"] .text-slate-300,
+.light [role="dialog"] .text-slate-400 {
+  color: #64748b !important;
+}
