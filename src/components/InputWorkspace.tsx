@@ -290,7 +290,7 @@ export const InputWorkspace: React.FC<InputWorkspaceProps> = ({
           type="button"
           onClick={onRunAnalysis}
           disabled={isAnalyzing || !jobDescription.trim() || !resumeText.trim()}
-          className={`w-full min-h-[52px] py-3.5 px-6 rounded-2xl font-display text-sm font-bold tracking-wide transition shadow-xl flex items-center justify-center gap-3 active:scale-[0.99] cursor-pointer ${
+          className={`analyze-primary-btn w-full min-h-[52px] py-3.5 px-6 rounded-2xl font-display text-sm font-bold tracking-wide transition shadow-xl flex items-center justify-center gap-3 active:scale-[0.99] cursor-pointer ${
             !jobDescription.trim() || !resumeText.trim()
               ? 'bg-slate-800 text-slate-400 cursor-not-allowed border border-white/10'
               : 'bg-lime-400 text-slate-950 hover:bg-lime-300 shadow-[0_0_30px_rgba(163,230,53,0.3)]'

@@ -45,16 +45,16 @@ export const Header: React.FC<HeaderProps> = ({
 
             <div className="flex items-center gap-3">
               <div
-                className="grid h-10 w-10 place-items-center rounded-xl border border-lime-400/40 bg-lime-400/15 text-lime-300 shadow-[0_0_24px_rgba(163,230,53,0.2)]"
+                className="header-brand-logo grid h-10 w-10 place-items-center rounded-xl border border-lime-400/40 bg-lime-400/15 text-lime-300 shadow-[0_0_24px_rgba(163,230,53,0.2)] transition-colors"
                 aria-hidden="true"
               >
                 <Sparkles className="w-5 h-5" />
               </div>
               <div className="flex items-center gap-2">
-                <span className="font-display text-xl font-bold tracking-tight text-white">
-                  Resume<span className="text-lime-300">Synth</span>
+                <span className="font-display text-xl font-bold tracking-tight text-white header-brand-name transition-colors">
+                  Resume<span className="text-lime-300 header-brand-accent transition-colors">Synth</span>
                 </span>
-                <span className="hidden sm:inline-flex rounded-full border border-cyan-400/30 bg-cyan-400/10 px-2.5 py-0.5 font-mono text-[10px] uppercase tracking-widest text-cyan-300 font-bold">
+                <span className="header-brand-badge hidden sm:inline-flex rounded-full border border-cyan-400/30 bg-cyan-400/10 px-2.5 py-0.5 font-mono text-[10px] uppercase tracking-widest text-cyan-300 font-bold transition-colors">
                   PRO
                 </span>
               </div>
@@ -130,7 +130,7 @@ export const Header: React.FC<HeaderProps> = ({
             <button
               type="button"
               onClick={onOpenExport}
-              className="min-h-[44px] px-4 py-2 rounded-xl bg-lime-400 text-slate-950 text-xs font-bold hover:bg-lime-300 transition shadow-[0_0_20px_rgba(163,230,53,0.3)] active:scale-95 cursor-pointer flex items-center gap-2"
+              className="header-export-btn min-h-[44px] px-4 py-2 rounded-xl bg-lime-400 text-slate-950 text-xs font-bold hover:bg-lime-300 transition shadow-[0_0_20px_rgba(163,230,53,0.3)] active:scale-95 cursor-pointer flex items-center gap-2"
               aria-label="Open export options and PDF generation dialog"
             >
               <Download className="w-4 h-4" aria-hidden="true" />

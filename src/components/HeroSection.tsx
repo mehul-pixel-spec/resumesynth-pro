@@ -18,7 +18,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
   return (
     <section aria-labelledby="hero-title" className="mb-10">
       {/* Kicker badge */}
-      <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-lime-400/30 bg-lime-400/10 text-lime-300 font-mono text-xs uppercase tracking-wider font-bold mb-4 shadow-[0_0_20px_rgba(163,230,53,0.15)]">
+      <div className="hero-kicker inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-lime-400/30 bg-lime-400/10 text-lime-300 font-mono text-xs uppercase tracking-wider font-bold mb-4 shadow-[0_0_20px_rgba(163,230,53,0.15)] transition-colors">
         <Sparkles className="w-4 h-4" aria-hidden="true" />
         <span>Evidence Over Buzzwords · Clear ATS Scoring</span>
       </div>
@@ -27,34 +27,34 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
         <div>
           <h1
             id="hero-title"
-            className="font-display text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white leading-[1.08]"
+            className="font-display text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white leading-[1.08] transition-colors"
           >
             Tailor your resume{' '}
-            <span className="text-lime-300 underline decoration-lime-400/30 underline-offset-8">
+            <span className="hero-title-accent text-lime-300 underline decoration-lime-400/30 underline-offset-8 transition-colors">
               to any job with proof.
             </span>
           </h1>
 
-          <p className="mt-4 text-base sm:text-lg text-slate-200 max-w-2xl leading-relaxed">
+          <p className="hero-description mt-4 text-base sm:text-lg text-slate-200 max-w-2xl leading-relaxed transition-colors">
             Upload your resume, analyze the target job description, and get transparent ATS signal scores. 
             Fix gaps with verifiable proof and prepare for high-stakes technical interviews.
           </p>
         </div>
 
         {/* Signal Legend Pill Card */}
-        <aside aria-label="Signal Legend" className="rounded-2xl border border-white/[0.1] bg-black/50 p-5 backdrop-blur-md">
+        <aside aria-label="Signal Legend" className="hero-legend-card rounded-2xl border border-white/[0.1] bg-black/50 p-5 backdrop-blur-md transition-colors">
           <div className="flex items-center justify-between mb-3 text-xs font-bold text-white uppercase tracking-wider font-mono">
             <span>ATS Signal Framework</span>
-            <ShieldCheck className="w-4 h-4 text-lime-400" aria-hidden="true" />
+            <ShieldCheck className="w-4 h-4 text-lime-400 legend-shield-icon" aria-hidden="true" />
           </div>
 
           <div className="space-y-2.5 text-xs text-slate-200">
             <div className="flex items-center gap-2.5">
-              <span className="w-2.5 h-2.5 rounded-full bg-lime-400 shrink-0" aria-hidden="true" />
+              <span className="w-2.5 h-2.5 rounded-full bg-lime-400 shrink-0 legend-dot-match" aria-hidden="true" />
               <span><strong>Verified Match:</strong> Grounded in resume text</span>
             </div>
             <div className="flex items-center gap-2.5">
-              <span className="w-2.5 h-2.5 rounded-full bg-rose-400 shrink-0" aria-hidden="true" />
+              <span className="w-2.5 h-2.5 rounded-full bg-rose-400 shrink-0 legend-dot-miss" aria-hidden="true" />
               <span><strong>Missing Signal:</strong> Job term not evidenced yet</span>
             </div>
             <div className="flex items-center gap-2.5">

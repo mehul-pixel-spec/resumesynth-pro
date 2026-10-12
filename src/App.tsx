@@ -160,10 +160,14 @@ export const App: React.FC = () => {
   };
 
   return (
-    <div className={`min-h-screen ${isDark ? 'dark bg-[#070c18] text-slate-100' : 'light bg-slate-50 text-slate-900'} font-sans selection:bg-lime-400 selection:text-slate-950 transition-colors duration-200`}>
-      {/* Ambient background glow orbs */}
-      <div className="fixed top-0 left-1/4 w-[600px] h-[600px] bg-lime-400/[0.035] rounded-full blur-[140px] pointer-events-none" aria-hidden="true" />
-      <div className="fixed bottom-0 right-1/4 w-[600px] h-[600px] bg-cyan-400/[0.035] rounded-full blur-[140px] pointer-events-none" aria-hidden="true" />
+    <div className={`min-h-screen ${isDark ? 'dark bg-[#070c18] text-slate-100 selection:bg-lime-400 selection:text-slate-950' : 'light bg-slate-50 text-slate-900 selection:bg-indigo-500 selection:text-white'} font-sans transition-colors duration-200`}>
+      {/* Ambient background glow orbs - active in dark mode only */}
+      {isDark && (
+        <>
+          <div className="fixed top-0 left-1/4 w-[600px] h-[600px] bg-lime-400/[0.035] rounded-full blur-[140px] pointer-events-none" aria-hidden="true" />
+          <div className="fixed bottom-0 right-1/4 w-[600px] h-[600px] bg-cyan-400/[0.035] rounded-full blur-[140px] pointer-events-none" aria-hidden="true" />
+        </>
+      )}
 
       {/* Header */}
       <Header

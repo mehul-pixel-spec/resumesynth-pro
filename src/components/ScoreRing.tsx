@@ -20,25 +20,25 @@ export const ScoreRing: React.FC<ScoreRingProps> = ({
   const circumference = 2 * Math.PI * radius;
   const strokeDashoffset = circumference - (score / 100) * circumference;
 
-  let strokeColor = "#a3e635"; // high-contrast lime
+  let strokeColor = "var(--score-strong, #a3e635)";
   let statusText = "Strong Match";
-  let statusBadgeClass = "bg-lime-400/15 text-lime-300 border-lime-400/30";
+  let statusBadgeClass = "bg-lime-400/15 text-lime-300 border-lime-400/30 score-badge-strong";
   let StatusIcon = CheckCircle2;
 
   if (score < 60) {
-    strokeColor = "#f43f5e"; // rose
+    strokeColor = "var(--score-low, #f43f5e)";
     statusText = "Significant Gaps";
-    statusBadgeClass = "bg-rose-400/15 text-rose-200 border-rose-400/30";
+    statusBadgeClass = "bg-rose-400/15 text-rose-200 border-rose-400/30 score-badge-low";
     StatusIcon = AlertCircle;
   } else if (score < 75) {
-    strokeColor = "#facc15"; // amber
+    strokeColor = "var(--score-med, #facc15)";
     statusText = "Needs Evidence";
-    statusBadgeClass = "bg-amber-400/15 text-amber-200 border-amber-400/30";
+    statusBadgeClass = "bg-amber-400/15 text-amber-200 border-amber-400/30 score-badge-med";
     StatusIcon = AlertTriangle;
   } else if (score < 88) {
-    strokeColor = "#38bdf8"; // sky
+    strokeColor = "var(--score-good, #38bdf8)";
     statusText = "Good Match";
-    statusBadgeClass = "bg-sky-400/15 text-sky-200 border-sky-400/30";
+    statusBadgeClass = "bg-sky-400/15 text-sky-200 border-sky-400/30 score-badge-good";
     StatusIcon = CheckCircle2;
   }
 
