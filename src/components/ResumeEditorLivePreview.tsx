@@ -1,21 +1,20 @@
 import React, { useState } from 'react';
-import { AnalysisResult, PreviewTemplate } from '../types';
-import { FileEdit, Eye, Printer, Copy, Check, Sparkles, Layout } from 'lucide-react';
+import { Download, Copy, Check, Printer, FileText, Layout, Eye, Sparkles } from 'lucide-react';
 
 interface ResumeEditorLivePreviewProps {
   resumeText: string;
-  onResumeChange: (val: string) => void;
-  analysis: AnalysisResult;
-  targetRole: string;
+  onResumeTextChange: (newText: string) => void;
+  keywordsToHighlight?: string[];
+  onExport: () => void;
 }
 
 export const ResumeEditorLivePreview: React.FC<ResumeEditorLivePreviewProps> = ({
   resumeText,
-  onResumeChange,
-  analysis
+  onResumeTextChange,
+  keywordsToHighlight = [],
+  onExport
 }) => {
-  const [template, setTemplate] = useState<PreviewTemplate>('modern');
-  const [highlightKeywords, setHighlightKeywords] = useState(true);
+  const [template, setTemplate] = useState<'editorial' | 'compact' | 'classic'>('editorial');
   const [copied, setCopied] = useState(false);
 
   const handleCopy = async () => {
@@ -28,241 +27,166 @@ export const ResumeEditorLivePreview: React.FC<ResumeEditorLivePreviewProps> = (
     }
   };
 
-  const parseResumeSections = (text: string) => {
-    const lines = text.split('\n');
-    const sections: { title: string; content: string[] }[] = [];
-    let currentSection = { title: 'Header', content: [] as string[] };
-
-    lines.forEach(line => {
-      const trimmed = line.trim();
-      if (trimmed.startsWith('## ') || trimmed.startsWith('# ')) {
-        if (currentSection.content.length > 0 || currentSection.title !== 'Header') {
-          sections.push(currentSection);
-        }
-        currentSection = {
-          title: trimmed.replace(/^#+\s*/, ''),
-          content: []
-        };
-      } else if (trimmed.length > 0) {
-        currentSection.content.push(line);
-      }
-    });
-
-    if (currentSection.content.length > 0 || currentSection.title !== 'Header') {
-      sections.push(currentSection);
-    }
-
-    return sections;
-  };
-
-  const sections = parseResumeSections(resumeText);
-
-  const renderHighlightedContent = (line: string) => {
-    if (!highlightKeywords || analysis.matched.length === 0) {
-      return line.replace(/^[*•-]\s*/, '');
-    }
-
-    let text = line.replace(/^[*•-]\s*/, '');
-    const terms = analysis.matched.map(m => m.term);
-
-    const pattern = new RegExp(`(${terms.map(t => t.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&')).join('|')})`, 'gi');
-    const parts = text.split(pattern);
-
-    return (
-      <>
-        {parts.map((part, i) => {
-          const isMatch = terms.some(t => t.toLowerCase() === part.toLowerCase());
-          return isMatch ? (
-            <mark key={i} className="bg-lime-400/25 text-lime-200 px-1 py-0.5 rounded font-bold border border-lime-400/40">
-              {part}
-            </mark>
-          ) : (
-            <React.Fragment key={i}>{part}</React.Fragment>
-          );
-        })}
-      </>
-    );
-  };
+  // Convert raw text into styled paragraph sections
+  const lines = resumeText.split('\n');
 
   return (
-    <section id="resume-editor" aria-labelledby="editor-preview-heading" className="rounded-2xl border border-white/[0.12] bg-slate-900/75 p-6 backdrop-blur-xl shadow-2xl">
-      {/* Top Bar Controls */}
-      <div className="flex flex-wrap items-center justify-between gap-4 pb-5 border-b border-white/[0.1]">
+    <article
+      id="live-preview"
+      aria-labelledby="preview-heading"
+      className="border-2 border-[var(--ink-solid)] paper-surface p-6 sm:p-8 mb-14"
+    >
+      {/* Top Banner */}
+      <div className="flex flex-wrap items-baseline justify-between border-b paper-border pb-4 mb-6 gap-3">
         <div>
-          <div className="flex items-center gap-2">
-            <FileEdit className="w-5 h-5 text-cyan-300" aria-hidden="true" />
-            <h3 id="editor-preview-heading" className="font-display text-lg font-bold text-white tracking-tight">
-              Resume Editor & Real-Time ATS Preview
-            </h3>
-          </div>
-          <p className="text-xs text-slate-300 mt-0.5">
-            Full markdown editing with keyword highlighting and standard ATS render templates.
+          <span className="font-mono text-xs uppercase tracking-widest text-[var(--vermilion)] font-bold">
+            Output Folio & Preview
+          </span>
+          <h2 id="preview-heading" className="font-serif text-2xl font-bold text-[var(--ink-solid)] mt-0.5">
+            Real-Time Typeset Resume Specimen
+          </h2>
+          <p className="text-xs text-[var(--ink-muted)] mt-1">
+            Standard 8.5" × 11" printable geometry with verified ATS keyword highlighting.
           </p>
         </div>
 
-        {/* View Controls */}
-        <div className="flex flex-wrap items-center gap-3">
-          {/* Highlight Toggle */}
-          <button
-            type="button"
-            onClick={() => setHighlightKeywords(!highlightKeywords)}
-            className={`min-h-[44px] px-3.5 py-2 rounded-xl text-xs font-semibold transition flex items-center gap-2 border cursor-pointer ${
-              highlightKeywords
-                ? 'bg-lime-400/20 text-lime-200 border-lime-400/40 shadow-sm'
-                : 'bg-white/[0.06] text-slate-300 border-white/10 hover:text-white'
-            }`}
-            aria-pressed={highlightKeywords}
-          >
-            <Sparkles className="w-4 h-4" aria-hidden="true" />
-            <span>Keyword Highlighting</span>
-          </button>
-
-          {/* Template Selector with Label */}
-          <div className="flex items-center gap-2 bg-black/50 p-1.5 rounded-xl border border-white/[0.1]">
-            <label htmlFor="template-select" className="text-xs text-slate-300 flex items-center gap-1.5 pl-2 font-medium">
-              <Layout className="w-4 h-4 text-slate-400" aria-hidden="true" />
-              <span>Template:</span>
-            </label>
-            <select
-              id="template-select"
-              value={template}
-              onChange={(e) => setTemplate(e.target.value as PreviewTemplate)}
-              className="bg-transparent text-xs text-slate-100 pr-3 py-1 font-semibold focus:outline-none cursor-pointer"
+        {/* Template Style Switcher */}
+        <div className="flex items-center gap-2">
+          <span className="font-mono text-xs text-[var(--ink-faint)] hidden sm:inline">Specimen Style:</span>
+          <div className="flex items-center border paper-border p-0.5 font-mono text-xs bg-[var(--paper-subtle)]">
+            <button
+              type="button"
+              onClick={() => setTemplate('editorial')}
+              className={`px-2.5 py-1 cursor-pointer transition ${
+                template === 'editorial' ? 'bg-[var(--ink-solid)] text-[var(--paper-bg)] font-semibold' : 'text-[var(--ink-muted)]'
+              }`}
             >
-              <option value="modern" className="bg-slate-900 text-white">Modern Tech</option>
-              <option value="minimal" className="bg-slate-900 text-white">Clean Minimal</option>
-              <option value="ats_classic" className="bg-slate-900 text-white">Harvard ATS Standard</option>
-              <option value="executive" className="bg-slate-900 text-white">Executive Serif</option>
-            </select>
+              Editorial
+            </button>
+            <button
+              type="button"
+              onClick={() => setTemplate('compact')}
+              className={`px-2.5 py-1 cursor-pointer transition ${
+                template === 'compact' ? 'bg-[var(--ink-solid)] text-[var(--paper-bg)] font-semibold' : 'text-[var(--ink-muted)]'
+              }`}
+            >
+              Compact
+            </button>
+            <button
+              type="button"
+              onClick={() => setTemplate('classic')}
+              className={`px-2.5 py-1 cursor-pointer transition ${
+                template === 'classic' ? 'bg-[var(--ink-solid)] text-[var(--paper-bg)] font-semibold' : 'text-[var(--ink-muted)]'
+              }`}
+            >
+              Classic
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Main Split: Editable Raw Stream on Left, Typeset Specimen on Right */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        
+        {/* Left: Raw Text Stream */}
+        <div className="lg:col-span-5 space-y-3">
+          <div className="flex items-center justify-between pb-2 border-b paper-border">
+            <span className="font-mono text-xs uppercase text-[var(--ink-muted)] font-semibold">
+              Raw Text Stream
+            </span>
+            <span className="font-mono text-[11px] text-[var(--ink-faint)]">Live Markdown</span>
           </div>
 
-          {/* Actions */}
-          <div className="flex items-center gap-2">
+          <textarea
+            value={resumeText}
+            onChange={(e) => onResumeTextChange(e.target.value)}
+            placeholder="Edit resume draft in real-time..."
+            className="w-full min-h-[500px] p-4 bg-transparent border paper-border text-xs font-mono text-[var(--ink-solid)] leading-relaxed focus:border-[var(--vermilion)] outline-none resize-y"
+          />
+
+          <div className="flex items-center justify-between pt-2">
             <button
               type="button"
               onClick={handleCopy}
-              className="min-h-[44px] px-3.5 py-2 rounded-xl bg-white/[0.08] hover:bg-white/[0.16] border border-white/15 text-xs font-bold text-slate-100 transition flex items-center gap-1.5 cursor-pointer"
-              aria-label="Copy resume markdown text to clipboard"
+              className="px-3 py-1.5 border paper-border font-mono text-xs text-[var(--ink-solid)] hover:bg-[var(--paper-subtle)] flex items-center gap-1.5 cursor-pointer"
             >
-              {copied ? <Check className="w-4 h-4 text-lime-400" aria-hidden="true" /> : <Copy className="w-4 h-4" aria-hidden="true" />}
+              {copied ? <Check className="w-3.5 h-3.5 text-[var(--match-green)]" /> : <Copy className="w-3.5 h-3.5" />}
               <span>{copied ? 'Copied' : 'Copy Text'}</span>
             </button>
 
             <button
               type="button"
-              onClick={() => window.print()}
-              className="min-h-[44px] px-4 py-2 rounded-xl bg-cyan-400 hover:bg-cyan-300 text-slate-950 text-xs font-bold transition flex items-center gap-2 shadow-md active:scale-95 cursor-pointer"
-              aria-label="Print or save as PDF"
+              onClick={onExport}
+              className="px-4 py-1.5 bg-[var(--vermilion)] text-white font-mono text-xs uppercase tracking-wider font-bold hover:opacity-95 flex items-center gap-1.5 cursor-pointer shadow-xs"
             >
-              <Printer className="w-4 h-4" aria-hidden="true" />
-              <span>Print / Save PDF</span>
+              <Download className="w-3.5 h-3.5" />
+              <span>Export PDF</span>
             </button>
           </div>
         </div>
-      </div>
 
-      {/* Editor & Preview Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
-        {/* Left: Code Editor */}
-        <div className="flex flex-col">
-          <div className="flex items-center justify-between pb-2 mb-2 border-b border-white/[0.1] text-xs text-slate-300">
-            <label htmlFor="markdown-editor-pane" className="font-mono uppercase text-xs font-bold text-slate-200">
-              Markdown Editor
-            </label>
-            <div className="flex items-center gap-3 font-mono text-xs">
-              <span>{analysis.wordCount} words</span>
-              <span className="text-white/20">•</span>
-              <span>{analysis.bulletsCount} bullets</span>
-            </div>
-          </div>
-
-          <textarea
-            id="markdown-editor-pane"
-            value={resumeText}
-            onChange={(e) => onResumeChange(e.target.value)}
-            className="w-full flex-1 min-h-[480px] p-4 rounded-xl bg-black/60 border border-white/15 text-slate-100 font-mono text-sm sm:text-xs leading-relaxed resize-y focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 shadow-inner"
-            placeholder="Type or edit your markdown resume here..."
-          />
-        </div>
-
-        {/* Right: Rendered Resume */}
-        <div className="flex flex-col">
-          <div className="flex items-center justify-between pb-2 mb-2 border-b border-white/[0.1] text-xs text-slate-300">
-            <span className="font-mono uppercase text-xs font-bold text-slate-200 flex items-center gap-2">
-              <Eye className="w-4 h-4 text-lime-400" aria-hidden="true" />
-              Live ATS Preview ({template})
-            </span>
-            <span className="text-xs text-lime-300 font-mono font-bold">
-              Match Score: {analysis.overall}%
-            </span>
-          </div>
-
+        {/* Right: Printed Paper Replica */}
+        <div className="lg:col-span-7">
           <div
             id="printable-resume"
-            className={`flex-1 min-h-[480px] rounded-xl p-6 shadow-2xl overflow-y-auto ${
-              template === 'modern'
-                ? 'bg-slate-950 text-slate-100 border border-white/15 font-sans'
-                : template === 'minimal'
-                ? 'bg-white text-slate-950 border border-slate-300 font-sans'
-                : template === 'ats_classic'
-                ? 'bg-white text-black border border-slate-400 font-mono'
-                : 'bg-[#faf8f5] text-slate-900 border border-amber-300/60 font-serif'
-            }`}
-            tabIndex={0}
-            role="region"
-            aria-label="Rendered Resume Document Preview"
+            className="border-2 border-[var(--ink-solid)] bg-white text-[#111111] p-6 sm:p-10 shadow-md font-sans text-xs leading-relaxed max-w-full overflow-x-auto min-h-[550px]"
           >
-            <div className={`pb-4 mb-4 border-b ${template === 'modern' ? 'border-white/15' : 'border-slate-400'}`}>
-              <h4 className={`text-xl font-bold tracking-tight ${template === 'modern' ? 'text-white' : 'text-slate-950'}`}>
-                Alex Morgan, Software Engineer
-              </h4>
-              <p className={`text-xs mt-1.5 ${template === 'modern' ? 'text-slate-300' : 'text-slate-700'}`}>
-                alex.morgan@example.com • +1 (555) 234-5678 • San Francisco, CA • github.com/alexmorgan
-              </p>
+            {/* Specimen Letterhead */}
+            <div className="border-b-2 border-black pb-4 mb-5 flex justify-between items-start">
+              <div>
+                <h3 className="font-serif text-2xl font-bold tracking-tight text-black uppercase">
+                  {lines[0] || 'CANDIDATE NAME'}
+                </h3>
+                <p className="font-mono text-[11px] text-gray-700 mt-0.5">
+                  {lines[1] || 'Senior Software Engineer · San Francisco, CA · portfolio.dev'}
+                </p>
+              </div>
+              <span className="font-mono text-[10px] uppercase tracking-wider px-2 py-0.5 border border-black bg-gray-100">
+                A4 Format
+              </span>
             </div>
 
-            <div className="space-y-4 text-xs leading-relaxed">
-              {sections.map((sec, idx) => {
-                if (sec.title === 'Header') return null;
-                return (
-                  <section key={idx} className="space-y-1.5">
-                    <h5
-                      className={`text-xs font-bold uppercase tracking-wider pb-1 border-b ${
-                        template === 'modern'
-                          ? 'text-cyan-300 border-cyan-400/30'
-                          : template === 'minimal'
-                          ? 'text-slate-900 border-slate-400'
-                          : template === 'ats_classic'
-                          ? 'text-black border-black font-mono'
-                          : 'text-amber-950 border-amber-900/30 font-serif'
-                      }`}
+            {/* Resume Content Body */}
+            <div className="space-y-3 font-sans text-[12px] text-gray-800">
+              {lines.slice(2).map((line, idx) => {
+                const trimmed = line.trim();
+                if (!trimmed) return <div key={idx} className="h-1" />;
+
+                // Heading detection
+                if (trimmed.startsWith('#') || trimmed.toUpperCase() === trimmed && trimmed.length < 35 && !trimmed.startsWith('-')) {
+                  return (
+                    <h4
+                      key={idx}
+                      className="font-serif text-xs uppercase tracking-widest font-bold text-black border-b border-gray-300 pb-1 mt-4"
                     >
-                      {sec.title}
-                    </h5>
-                    <div className="space-y-1 pt-1">
-                      {sec.content.map((cLine, cIdx) => {
-                        const isBullet = cLine.trim().startsWith('*') || cLine.trim().startsWith('-') || cLine.trim().startsWith('•');
-                        return (
-                          <div key={cIdx} className={isBullet ? 'flex items-start gap-2 pl-2' : ''}>
-                            {isBullet && (
-                              <span className={`text-xs select-none ${template === 'modern' ? 'text-cyan-400' : 'text-slate-700'}`} aria-hidden="true">
-                                •
-                              </span>
-                            )}
-                            <p className={`${template === 'modern' ? 'text-slate-200' : 'text-slate-900'}`}>
-                              {renderHighlightedContent(cLine)}
-                            </p>
-                          </div>
-                        );
-                      })}
+                      {trimmed.replace(/^#+\s*/, '')}
+                    </h4>
+                  );
+                }
+
+                // Bullet point detection
+                if (trimmed.startsWith('-') || trimmed.startsWith('•')) {
+                  return (
+                    <div key={idx} className="flex items-start gap-2 pl-2">
+                      <span className="text-black font-bold">▪</span>
+                      <p className="leading-relaxed">
+                        {trimmed.replace(/^[-•]\s*/, '')}
+                      </p>
                     </div>
-                  </section>
+                  );
+                }
+
+                return (
+                  <p key={idx} className="leading-relaxed">
+                    {trimmed}
+                  </p>
                 );
               })}
             </div>
           </div>
         </div>
+
       </div>
-    </section>
+    </article>
   );
 };

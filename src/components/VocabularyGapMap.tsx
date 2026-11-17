@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { AnalysisResult } from '../types';
-import { CheckCircle2, AlertCircle, Plus, Sparkles, Search } from 'lucide-react';
+import { CheckCircle2, AlertCircle, Plus, Search, Tag } from 'lucide-react';
 import { SmoothInput } from './ui/SmoothInput';
 
 interface VocabularyGapMapProps {
@@ -23,157 +23,139 @@ export const VocabularyGapMap: React.FC<VocabularyGapMapProps> = ({ analysis, on
   return (
     <article
       aria-labelledby="gap-map-heading"
-      className="rounded-2xl border border-white/[0.12] bg-slate-900/75 p-5 backdrop-blur-xl shadow-xl flex flex-col justify-between"
+      className="border paper-border paper-surface p-6 sm:p-8 mb-14"
     >
-      {/* Header */}
-      <div>
-        <div className="flex flex-wrap items-start justify-between gap-3 mb-4">
-          <div>
-            <div className="flex items-center gap-2">
-              <Sparkles className="w-4 h-4 text-lime-300" aria-hidden="true" />
-              <h3 id="gap-map-heading" className="font-display text-base font-bold text-white tracking-tight">
-                Vocabulary Gap Matrix
-              </h3>
-            </div>
-            <p className="text-xs text-slate-300 mt-1">
-              Exact job requirements detected in your resume vs. signals still missing.
-            </p>
-          </div>
-
-          {/* Filter Group */}
-          <div className="flex items-center gap-1.5 p-1 rounded-xl bg-black/50 border border-white/[0.1]" role="tablist" aria-label="Keyword filters">
-            <button
-              type="button"
-              onClick={() => setFilter('all')}
-              role="tab"
-              aria-selected={filter === 'all'}
-              className={`min-h-[36px] px-3 py-1.5 rounded-lg text-xs font-semibold transition cursor-pointer ${
-                filter === 'all'
-                  ? 'bg-lime-400/25 text-lime-200 border border-lime-400/40 shadow-sm'
-                  : 'text-slate-300 hover:text-white'
-              }`}
-            >
-              All ({analysis.matched.length + analysis.missing.length})
-            </button>
-            <button
-              type="button"
-              onClick={() => setFilter('matched')}
-              role="tab"
-              aria-selected={filter === 'matched'}
-              className={`min-h-[36px] px-3 py-1.5 rounded-lg text-xs font-semibold transition cursor-pointer ${
-                filter === 'matched'
-                  ? 'bg-lime-400/25 text-lime-200 border border-lime-400/40 shadow-sm'
-                  : 'text-slate-300 hover:text-white'
-              }`}
-            >
-              Matched ({analysis.matched.length})
-            </button>
-            <button
-              type="button"
-              onClick={() => setFilter('missing')}
-              role="tab"
-              aria-selected={filter === 'missing'}
-              className={`min-h-[36px] px-3 py-1.5 rounded-lg text-xs font-semibold transition cursor-pointer ${
-                filter === 'missing'
-                  ? 'bg-rose-400/25 text-rose-200 border border-rose-400/40 shadow-sm'
-                  : 'text-slate-300 hover:text-white'
-              }`}
-            >
-              Missing ({analysis.missing.length})
-            </button>
-          </div>
+      {/* Editorial Header */}
+      <div className="flex flex-wrap items-baseline justify-between border-b paper-border pb-4 mb-6 gap-3">
+        <div>
+          <span className="font-mono text-xs uppercase tracking-widest text-[var(--vermilion)] font-bold">
+            Vocabulary Matrix
+          </span>
+          <h2 id="gap-map-heading" className="font-serif text-2xl font-bold text-[var(--ink-solid)] mt-0.5">
+            Verified Competence vs. Unclaimed Keywords
+          </h2>
+          <p className="text-xs text-[var(--ink-muted)] mt-1">
+            ATS engines parse exact term occurrences. Verified terms are evidenced in your draft; gaps should be incorporated into relevant project bullets.
+          </p>
         </div>
 
-        {/* Search Bar with Smooth Animated Caret */}
-        <div className="mb-4">
-          <label htmlFor="keyword-search-input" className="sr-only">
-            Filter skills by name
-          </label>
-          <SmoothInput
-            id="keyword-search-input"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Filter skills or tools (e.g., Docker, SQL, Python)..."
-            leadingIcon={<Search className="w-4 h-4" aria-hidden="true" />}
-            caretColor="bg-lime-400 shadow-[0_0_8px_rgba(163,230,53,0.8)]"
-          />
-        </div>
-
-        <div className="space-y-4">
-          {/* Verified Keywords Section */}
-          {(filter === 'all' || filter === 'matched') && (
-            <div>
-              <div className="flex items-center justify-between mb-2">
-                <span className="flex items-center gap-1.5 text-xs font-semibold text-lime-300 uppercase tracking-wider font-mono">
-                  <CheckCircle2 className="w-4 h-4 text-lime-400" aria-hidden="true" />
-                  Verified in Resume ({filteredMatched.length})
-                </span>
-                <span className="text-xs text-slate-400">Occurrences counted</span>
-              </div>
-
-              {filteredMatched.length > 0 ? (
-                <div className="flex flex-wrap gap-2" role="list">
-                  {filteredMatched.map(item => (
-                    <span
-                      key={item.term}
-                      role="listitem"
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-lime-400/15 border border-lime-400/30 text-lime-200 shadow-sm"
-                    >
-                      <span>{item.term}</span>
-                      <span className="px-1.5 py-0.2 rounded-full bg-lime-400/25 text-[10px] font-mono text-lime-100 font-bold" aria-label={`found ${item.count} times`}>
-                        ×{item.count}
-                      </span>
-                    </span>
-                  ))}
-                </div>
-              ) : (
-                <p className="text-xs text-slate-400 italic">No matching keywords in this view.</p>
-              )}
-            </div>
-          )}
-
-          {/* Missing Keywords Section */}
-          {(filter === 'all' || filter === 'missing') && (
-            <div className="pt-2 border-t border-white/[0.08]">
-              <div className="flex items-center justify-between mb-2">
-                <span className="flex items-center gap-1.5 text-xs font-semibold text-rose-300 uppercase tracking-wider font-mono">
-                  <AlertCircle className="w-4 h-4 text-rose-400" aria-hidden="true" />
-                  Missing Requirements ({filteredMissing.length})
-                </span>
-                <span className="text-xs text-slate-400">Click to append bullet</span>
-              </div>
-
-              {filteredMissing.length > 0 ? (
-                <div className="flex flex-wrap gap-2" role="list">
-                  {filteredMissing.map(item => (
-                    <button
-                      key={item.term}
-                      type="button"
-                      onClick={() => onAddKeyword(item.term)}
-                      role="listitem"
-                      className="group min-h-[40px] inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold bg-rose-500/15 border border-rose-500/30 text-rose-200 hover:bg-rose-500/25 hover:border-rose-400 transition cursor-pointer active:scale-95"
-                      aria-label={`Add starter bullet for missing keyword ${item.term}`}
-                    >
-                      <span>{item.term}</span>
-                      {item.priority === 'high' && (
-                        <span className="px-1.5 py-0.2 rounded bg-rose-500/40 text-[9px] font-mono uppercase text-rose-100 font-bold">
-                          High
-                        </span>
-                      )}
-                      <Plus className="w-3.5 h-3.5 text-rose-300 group-hover:rotate-90 transition-transform duration-200" aria-hidden="true" />
-                    </button>
-                  ))}
-                </div>
-              ) : (
-                <p className="text-xs text-lime-300 italic">✓ No missing keywords detected for this role!</p>
-              )}
-            </div>
-          )}
+        {/* Filter Group: Pill Tabs */}
+        <div className="flex items-center border paper-border p-0.5 font-mono text-xs bg-[var(--paper-subtle)]" role="tablist">
+          <button
+            type="button"
+            onClick={() => setFilter('all')}
+            className={`px-3 py-1 cursor-pointer transition ${
+              filter === 'all'
+                ? 'bg-[var(--ink-solid)] text-[var(--paper-bg)] font-semibold'
+                : 'text-[var(--ink-muted)] hover:text-[var(--ink-solid)]'
+            }`}
+          >
+            All ({analysis.matched.length + analysis.missing.length})
+          </button>
+          <button
+            type="button"
+            onClick={() => setFilter('matched')}
+            className={`px-3 py-1 cursor-pointer transition ${
+              filter === 'matched'
+                ? 'bg-[var(--match-green)] text-white font-semibold'
+                : 'text-[var(--ink-muted)] hover:text-[var(--ink-solid)]'
+            }`}
+          >
+            Verified ({analysis.matched.length})
+          </button>
+          <button
+            type="button"
+            onClick={() => setFilter('missing')}
+            className={`px-3 py-1 cursor-pointer transition ${
+              filter === 'missing'
+                ? 'bg-[var(--vermilion)] text-white font-semibold'
+                : 'text-[var(--ink-muted)] hover:text-[var(--ink-solid)]'
+            }`}
+          >
+            Gaps ({analysis.missing.length})
+          </button>
         </div>
       </div>
 
-      <div className="mt-4 pt-3 border-t border-white/[0.08] text-xs text-slate-300">
-        <span>Grounded Rule: Only add terms you can truthfully defend in technical interviews.</span>
+      {/* Search Input with Fluid Animated Caret */}
+      <div className="mb-6">
+        <label htmlFor="keyword-search-input" className="sr-only">
+          Filter keyword inventory
+        </label>
+        <SmoothInput
+          id="keyword-search-input"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          placeholder="Search vocabulary by name (e.g. Docker, TypeScript, Microservices)..."
+          leadingIcon={<Search className="w-4 h-4 text-[var(--ink-faint)]" aria-hidden="true" />}
+          caretColor="bg-[var(--vermilion)]"
+          wrapperClassName="border paper-border bg-transparent focus-within:border-[var(--vermilion)]"
+        />
+      </div>
+
+      {/* Distinct 2-Column Ledger: Verified vs Gaps */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        
+        {/* Column 01: Verified Terms */}
+        {(filter === 'all' || filter === 'matched') && (
+          <div className="border paper-border p-4 bg-[var(--paper-subtle)]">
+            <div className="flex items-center justify-between pb-2 mb-3 border-b paper-border">
+              <span className="font-mono text-xs font-bold text-[var(--match-green)] flex items-center gap-1.5 uppercase">
+                <CheckCircle2 className="w-3.5 h-3.5" /> Evidenced in Resume ({filteredMatched.length})
+              </span>
+              <span className="font-mono text-[11px] text-[var(--ink-faint)]">Frequency</span>
+            </div>
+
+            <div className="flex flex-wrap gap-2 max-h-[320px] overflow-y-auto pr-1">
+              {filteredMatched.length === 0 ? (
+                <p className="text-xs font-mono text-[var(--ink-faint)] py-4">No verified terms matching search query.</p>
+              ) : (
+                filteredMatched.map((m) => (
+                  <span
+                    key={m.term}
+                    className="inline-flex items-center gap-1.5 px-2.5 py-1 border paper-border paper-surface text-xs font-mono text-[var(--ink-solid)]"
+                  >
+                    <span className="w-1.5 h-1.5 rounded-full bg-[var(--match-green)]" />
+                    <span>{m.term}</span>
+                    <span className="text-[10px] text-[var(--ink-faint)]">×{m.count}</span>
+                  </span>
+                ))
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Column 02: Missing Signal Gaps */}
+        {(filter === 'all' || filter === 'missing') && (
+          <div className="border paper-border p-4 bg-[var(--paper-subtle)]">
+            <div className="flex items-center justify-between pb-2 mb-3 border-b paper-border">
+              <span className="font-mono text-xs font-bold text-[var(--vermilion)] flex items-center gap-1.5 uppercase">
+                <AlertCircle className="w-3.5 h-3.5" /> High-Priority Gaps ({filteredMissing.length})
+              </span>
+              <span className="font-mono text-[11px] text-[var(--ink-faint)]">Click [+] to incorporate</span>
+            </div>
+
+            <div className="flex flex-wrap gap-2 max-h-[320px] overflow-y-auto pr-1">
+              {filteredMissing.length === 0 ? (
+                <p className="text-xs font-mono text-[var(--ink-faint)] py-4">No missing terms matching search query.</p>
+              ) : (
+                filteredMissing.map((m) => (
+                  <button
+                    key={m.term}
+                    type="button"
+                    onClick={() => onAddKeyword(m.term)}
+                    className="inline-flex items-center gap-1.5 px-2.5 py-1 border border-dashed border-[var(--vermilion)]/60 bg-[var(--vermilion-subtle)] text-xs font-mono text-[var(--ink-solid)] hover:bg-[var(--vermilion)] hover:text-white transition cursor-pointer"
+                    title={`Click to add ${m.term} to resume text`}
+                  >
+                    <span>{m.term}</span>
+                    <Plus className="w-3 h-3 opacity-70" />
+                  </button>
+                ))
+              )}
+            </div>
+          </div>
+        )}
+
       </div>
     </article>
   );

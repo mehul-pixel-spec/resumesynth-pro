@@ -2,41 +2,80 @@
 
 @layer base {
   :root {
-    --bg-main: #070c18;
-    --text-main: #f8fafc;
-    --text-muted: #94a3b8;
-    --score-strong: #a3e635;
-    --score-good: #38bdf8;
-    --score-med: #facc15;
-    --score-low: #f43f5e;
+    /* Warm Paper & Ink Light Mode (Default) */
+    --paper-bg: #FBF9F5;
+    --paper-surface: #FFFFFF;
+    --paper-subtle: #F3EFE9;
+    --ink-solid: #1B1815;
+    --ink-muted: #6B655D;
+    --ink-faint: #9E978F;
+    --rule-border: #E5DFD5;
+    --rule-strong: #CDC5B7;
+    
+    /* Editorial Accent */
+    --vermilion: #D9381E;
+    --vermilion-subtle: #FDF1EE;
+    --match-green: #1B6E47;
+    --match-green-subtle: #EDF7F1;
+    --gap-ochre: #B86B12;
+    --gap-ochre-subtle: #FAF3E8;
+
+    --font-serif: 'Fraunces', Georgia, serif;
+    --font-sans: 'Plus Jakarta Sans', system-ui, sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+  }
+
+  .dark {
+    /* Soot & Vellum Dark Mode */
+    --paper-bg: #121110;
+    --paper-surface: #1A1816;
+    --paper-subtle: #24211E;
+    --ink-solid: #F4EFEB;
+    --ink-muted: #A39B91;
+    --ink-faint: #6D665E;
+    --rule-border: #2C2824;
+    --rule-strong: #3D3833;
+    
+    --vermilion: #E54B32;
+    --vermilion-subtle: #2C1613;
+    --match-green: #2FA36B;
+    --match-green-subtle: #12281D;
+    --gap-ochre: #E08E28;
+    --gap-ochre-subtle: #2E2010;
   }
 
   body {
-    background-color: var(--bg-main);
-    color: var(--text-main);
-    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    font-size: 1rem;
+    background-color: var(--paper-bg);
+    color: var(--ink-solid);
+    font-family: var(--font-sans);
+    font-size: 0.95rem;
     line-height: 1.6;
+    letter-spacing: -0.01em;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
+
+  h1, h2, h3, .font-serif {
+    font-family: var(--font-serif);
+    font-feature-settings: "kern" 1, "liga" 1;
+  }
+
+  .font-mono {
+    font-family: var(--font-mono);
+    font-feature-settings: "tnum" 1;
+  }
 }
 
-/* 1. Global Keyboard Focus Outline (WCAG 2.4.7 Focus Visible) */
+/* Accessible deliberate focus rings */
 :focus-visible {
-  outline: 2px solid #2563eb !important;
-  outline-offset: 3px !important;
-  border-radius: 4px;
-}
-.dark :focus-visible {
-  outline: 2px solid #a3e635 !important;
+  outline: 2px solid var(--vermilion) !important;
+  outline-offset: 2px !important;
+  border-radius: 2px;
 }
 
-/* 2. Reduced Motion (WCAG 2.3.3 Animation from Interactions) */
+/* Reduced Motion respect */
 @media (prefers-reduced-motion: reduce) {
-  *,
-  ::before,
-  ::after {
+  *, ::before, ::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
@@ -44,7 +83,39 @@
   }
 }
 
-/* 3. High-Contrast Print Styles for PDF Generation */
+/* Paper Grid & Texture Helpers */
+.paper-border {
+  border-color: var(--rule-border);
+}
+
+.paper-surface {
+  background-color: var(--paper-surface);
+}
+
+.paper-subtle {
+  background-color: var(--paper-subtle);
+}
+
+/* Custom Editorial Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--rule-strong);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--ink-faint);
+}
+
+/* High-fidelity Print / PDF export styles */
 @media print {
   body * {
     visibility: hidden;
@@ -59,753 +130,10 @@
     top: 0;
     width: 100%;
     margin: 0;
-    padding: 24px;
+    padding: 0;
     background: #ffffff !important;
     color: #000000 !important;
     border: none !important;
     box-shadow: none !important;
   }
 }
-
-/* 4. Custom accessible scrollbars */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: rgba(0, 0, 0, 0.3);
-}
-
-::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.2);
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.35);
-}
-
-/* ========================================================
-   LIGHT MODE DESIGN SYSTEM - HUMAN CRAFTED SAAS PALETTE
-   ======================================================== */
-
-html.light,
-body.light,
-.light {
-  --bg-main: #f8fafc;
-  --text-main: #0f172a;
-  --text-muted: #64748b;
-  --score-strong: #059669;
-  --score-good: #0284c7;
-  --score-med: #d97706;
-  --score-low: #e11d48;
-  background-color: #f8fafc !important;
-  color: #0f172a !important;
-}
-
-/* Light Mode Scrollbars */
-.light ::-webkit-scrollbar-track {
-  background: #f1f5f9;
-}
-.light ::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
-}
-.light ::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
-}
-
-/* 1. Header & Navigation (Light Mode) */
-.light header[role="banner"] {
-  background-color: rgba(255, 255, 255, 0.95) !important;
-  border-bottom: 1px solid #e2e8f0 !important;
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.04) !important;
-}
-
-/* Header Brand Logo: Crisp Blue Badge instead of fluorescent AI green */
-.light .header-brand-logo {
-  background: linear-gradient(135deg, #2563eb, #1d4ed8) !important;
-  border: 1px solid #1e40af !important;
-  color: #ffffff !important;
-  box-shadow: 0 2px 4px rgba(37, 99, 235, 0.2) !important;
-}
-
-.light .header-brand-name {
-  color: #0f172a !important;
-}
-
-.light .header-brand-accent {
-  color: #2563eb !important;
-}
-
-.light .header-brand-badge {
-  background-color: #eff6ff !important;
-  border-color: #bfdbfe !important;
-  color: #1d4ed8 !important;
-}
-
-.light header nav a,
-.light header nav button {
-  color: #475569 !important;
-  font-weight: 500 !important;
-}
-
-.light header nav a:hover,
-.light header nav button:hover {
-  color: #0f172a !important;
-}
-
-/* Header Action Buttons (Light Mode) */
-.light header .theme-toggle-btn,
-.light header .sidebar-toggle-btn,
-.light header button[title*="Reset"],
-.light header button[aria-label="Open navigation menu"] {
-  background-color: #ffffff !important;
-  border: 1px solid #cbd5e1 !important;
-  color: #334155 !important;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04) !important;
-}
-
-.light header .theme-toggle-btn:hover,
-.light header .sidebar-toggle-btn:hover,
-.light header button[title*="Reset"]:hover,
-.light header button[aria-label="Open navigation menu"]:hover {
-  background-color: #f8fafc !important;
-  border-color: #94a3b8 !important;
-  color: #0f172a !important;
-}
-
-.light .shortcut-hint {
-  background-color: #f1f5f9 !important;
-  color: #64748b !important;
-  border: 1px solid #e2e8f0 !important;
-}
-
-.light .header-export-btn {
-  background-color: #0f172a !important;
-  color: #ffffff !important;
-  border: 1px solid #0f172a !important;
-  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.12) !important;
-}
-
-.light .header-export-btn:hover {
-  background-color: #1e293b !important;
-  box-shadow: 0 2px 4px rgba(15, 23, 42, 0.16) !important;
-}
-
-/* 2. Sidebar Navigation (Light Mode) */
-.light #sidebar-navigation {
-  background-color: #ffffff !important;
-  border-right: 1px solid #e2e8f0 !important;
-  box-shadow: 1px 0 3px rgba(0, 0, 0, 0.04) !important;
-}
-
-.light #sidebar-navigation .font-display,
-.light #sidebar-navigation h2,
-.light #sidebar-navigation h3 {
-  color: #0f172a !important;
-}
-
-.light #sidebar-navigation button {
-  color: #475569 !important;
-  font-weight: 500 !important;
-}
-
-.light #sidebar-navigation button:hover {
-  background-color: #f8fafc !important;
-  color: #0f172a !important;
-}
-
-.light #sidebar-navigation .sidebar-close-btn {
-  color: #64748b !important;
-}
-
-.light #sidebar-navigation .sidebar-close-btn:hover {
-  background-color: #f1f5f9 !important;
-  color: #0f172a !important;
-}
-
-.light .sidebar-brand-avatar {
-  background-color: #eff6ff !important;
-  border-color: #bfdbfe !important;
-  color: #1d4ed8 !important;
-}
-
-.light #sidebar-navigation button.bg-lime-400\/20 {
-  background-color: #eff6ff !important;
-  border: 1px solid #bfdbfe !important;
-  color: #1d4ed8 !important;
-}
-
-.light #sidebar-navigation .border-white\/10,
-.light #sidebar-navigation .border-white\/\[0\.1\] {
-  border-color: #e2e8f0 !important;
-}
-
-.light #sidebar-navigation .bg-black\/50,
-.light #sidebar-navigation .bg-white\/\[0\.04\] {
-  background-color: #f8fafc !important;
-  border: 1px solid #e2e8f0 !important;
-  color: #64748b !important;
-}
-
-.light #sidebar-navigation .bg-black\/50 span,
-.light #sidebar-navigation .bg-white\/\[0\.04\] span {
-  color: #0f172a !important;
-}
-
-/* Enlarged Panoramic Workspace Mode (When Sidebar is Closed) */
-.enlarged-workspace {
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-@media (min-width: 1024px) {
-  .enlarged-workspace #markdown-editor-pane {
-    min-height: 540px;
-  }
-  .enlarged-workspace #printable-resume {
-    min-height: 540px;
-  }
-}
-
-/* 3. Hero Section (Light Mode) */
-.light .hero-kicker {
-  background-color: #eff6ff !important;
-  border: 1px solid #bfdbfe !important;
-  color: #1d4ed8 !important;
-  box-shadow: none !important;
-  font-family: inherit !important;
-  font-weight: 600 !important;
-  letter-spacing: normal !important;
-}
-
-.light #hero-title {
-  color: #0f172a !important;
-}
-
-.light .hero-title-accent {
-  color: #2563eb !important;
-  text-decoration-color: #93c5fd !important;
-  text-underline-offset: 8px;
-}
-
-.light .hero-description {
-  color: #475569 !important;
-}
-
-.light .hero-legend-card {
-  background-color: #ffffff !important;
-  border: 1px solid #e2e8f0 !important;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05) !important;
-}
-
-.light .hero-legend-card div,
-.light .hero-legend-card span {
-  color: #334155 !important;
-}
-
-.light .hero-legend-card span.font-bold {
-  color: #0f172a !important;
-}
-
-.light .legend-shield-icon {
-  color: #2563eb !important;
-}
-
-.light .legend-dot-match {
-  background-color: #059669 !important;
-}
-
-.light .legend-dot-miss {
-  background-color: #e11d48 !important;
-}
-
-/* Presets Bar in Hero Section */
-.light #dashboard .bg-black\/50,
-.light #dashboard .bg-white\/\[0\.04\],
-.light #dashboard .bg-white\/\[0\.03\] {
-  background-color: #ffffff !important;
-  border: 1px solid #e2e8f0 !important;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04) !important;
-}
-
-.light #dashboard button.bg-white\/\[0\.06\] {
-  background-color: #f8fafc !important;
-  border: 1px solid #cbd5e1 !important;
-  color: #475569 !important;
-}
-
-.light #dashboard button.bg-white\/\[0\.06\]:hover {
-  background-color: #f1f5f9 !important;
-  border-color: #94a3b8 !important;
-  color: #0f172a !important;
-}
-
-.light #dashboard button.bg-lime-400\/25 {
-  background-color: #eff6ff !important;
-  border: 1px solid #3b82f6 !important;
-  color: #1d4ed8 !important;
-  box-shadow: 0 1px 2px rgba(37, 99, 235, 0.1) !important;
-}
-
-/* How It Works Expanded Banner */
-.light #dashboard [role="region"][aria-label="How ResumeSynth Works"] {
-  background-color: #ffffff !important;
-  border: 1px solid #e2e8f0 !important;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
-}
-
-.light #dashboard [role="region"] h3,
-.light #dashboard [role="region"] h4 {
-  color: #0f172a !important;
-}
-
-.light #dashboard [role="region"] p {
-  color: #475569 !important;
-}
-
-/* 4. Common Container & Card Surfaces (Light Mode) */
-.light article,
-.light section.rounded-2xl,
-.light div.rounded-2xl.border,
-.light section[id="my-resume"],
-.light section[id="ats-analysis"] > div.rounded-2xl {
-  background-color: #ffffff !important;
-  border: 1px solid #e2e8f0 !important;
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05) !important;
-}
-
-.light h1,
-.light h2,
-.light h3,
-.light h4,
-.light h5 {
-  color: #0f172a !important;
-}
-
-.light p {
-  color: #475569;
-}
-
-.light .text-slate-100,
-.light .text-slate-200,
-.light .text-white {
-  color: #1e293b !important;
-}
-
-.light .text-slate-300,
-.light .text-slate-400 {
-  color: #64748b !important;
-}
-
-.light .border-white\/10,
-.light .border-white\/15,
-.light .border-white\/20,
-.light .border-white\/\[0\.08\],
-.light .border-white\/\[0\.1\],
-.light .border-white\/\[0\.12\],
-.light .border-white\/\[0\.06\] {
-  border-color: #e2e8f0 !important;
-}
-
-.light .bg-black\/50,
-.light .bg-black\/60,
-.light .bg-black\/40 {
-  background-color: #f8fafc !important;
-  border: 1px solid #e2e8f0 !important;
-}
-
-.light .bg-slate-900\/60,
-.light .bg-slate-900\/75,
-.light .bg-slate-900 {
-  background-color: #ffffff !important;
-  border-color: #e2e8f0 !important;
-}
-
-/* 5. Inputs, Textareas, Selects & Form Controls (Light Mode) */
-.light textarea,
-.light select,
-.light input[type="text"] {
-  background-color: #ffffff !important;
-  border: 1px solid #cbd5e1 !important;
-  color: #0f172a !important;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02) !important;
-}
-
-.light textarea:focus,
-.light select:focus,
-.light input[type="text"]:focus {
-  background-color: #ffffff !important;
-  border-color: #2563eb !important;
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12) !important;
-  outline: none !important;
-}
-
-.light textarea::placeholder,
-.light input::placeholder {
-  color: #94a3b8 !important;
-}
-
-/* File Upload Zone in InputWorkspace */
-.light #my-resume label[for="resume-file-input"] {
-  background-color: #f8fafc !important;
-  border: 2px dashed #cbd5e1 !important;
-}
-.light #my-resume label[for="resume-file-input"]:hover {
-  background-color: #eff6ff !important;
-  border-color: #3b82f6 !important;
-}
-.light #my-resume label[for="resume-file-input"] svg {
-  color: #2563eb !important;
-}
-
-/* Analyze Primary Button */
-.light .analyze-primary-btn {
-  background-color: #2563eb !important;
-  color: #ffffff !important;
-  border: 1px solid #1d4ed8 !important;
-  box-shadow: 0 2px 4px rgba(37, 99, 235, 0.2) !important;
-}
-
-.light .analyze-primary-btn:hover {
-  background-color: #1d4ed8 !important;
-  box-shadow: 0 4px 8px rgba(37, 99, 235, 0.25) !important;
-}
-
-/* 6. ScoreRing & Signal Matrix (Light Mode) */
-.light circle.score-track,
-.light circle[stroke="#1e293b"] {
-  stroke: #e2e8f0 !important;
-}
-
-.light .score-badge-strong {
-  background-color: #ecfdf5 !important;
-  border-color: #a7f3d0 !important;
-  color: #065f46 !important;
-}
-
-.light .score-badge-good {
-  background-color: #f0f9ff !important;
-  border-color: #bae6fd !important;
-  color: #0369a1 !important;
-}
-
-.light .score-badge-med {
-  background-color: #fffbeb !important;
-  border-color: #fde68a !important;
-  color: #92400e !important;
-}
-
-.light .score-badge-low {
-  background-color: #fff1f2 !important;
-  border-color: #fecdd3 !important;
-  color: #9f1239 !important;
-}
-
-/* Metric Progress Meters */
-.light #ats-analysis .bg-black\/50 {
-  background-color: #f8fafc !important;
-  border: 1px solid #e2e8f0 !important;
-}
-
-.light #ats-analysis .bg-white\/15 {
-  background-color: #e2e8f0 !important;
-}
-
-.light #ats-analysis span.font-mono.text-lime-300 {
-  color: #059669 !important;
-}
-
-.light #ats-analysis span.font-mono.text-violet-300 {
-  color: #6366f1 !important;
-}
-
-.light #ats-analysis span.font-mono.text-cyan-300 {
-  color: #0284c7 !important;
-}
-
-.light #ats-analysis span.font-mono.text-emerald-300 {
-  color: #0d9488 !important;
-}
-
-.light #ats-analysis .bg-lime-400 {
-  background-color: #059669 !important;
-}
-
-.light #ats-analysis .bg-violet-400 {
-  background-color: #6366f1 !important;
-}
-
-.light #ats-analysis .bg-cyan-400 {
-  background-color: #0284c7 !important;
-}
-
-.light #ats-analysis .bg-emerald-400 {
-  background-color: #0d9488 !important;
-}
-
-/* Mode Selection Radio/Pill Group in ATS Analysis */
-.light #ats-analysis fieldset {
-  background-color: #f1f5f9 !important;
-  border: 1px solid #e2e8f0 !important;
-}
-
-.light #ats-analysis fieldset button {
-  color: #475569 !important;
-}
-
-.light #ats-analysis fieldset button.bg-lime-400\/25 {
-  background-color: #ffffff !important;
-  border: 1px solid #cbd5e1 !important;
-  color: #1d4ed8 !important;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
-}
-
-/* SignalGraph Canvas */
-.light .bg-\[\#060a14\]\/90 {
-  background-color: #f8fafc !important;
-  border-color: #e2e8f0 !important;
-}
-
-/* 7. Vocabulary Gap Map (Light Mode) */
-.light #gap-map-heading ~ div,
-.light [aria-labelledby="gap-map-heading"] .bg-black\/50 {
-  background-color: #f1f5f9 !important;
-  border: 1px solid #e2e8f0 !important;
-}
-
-.light [aria-labelledby="gap-map-heading"] button.bg-lime-400\/25 {
-  background-color: #ffffff !important;
-  border: 1px solid #cbd5e1 !important;
-  color: #0f172a !important;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
-}
-
-/* Keywords Chips */
-.light .bg-lime-400\/10,
-.light .bg-lime-400\/15,
-.light .bg-lime-400\/20,
-.light .bg-lime-400\/25 {
-  background-color: #ecfdf5 !important;
-  border: 1px solid #a7f3d0 !important;
-  color: #065f46 !important;
-}
-
-.light .text-lime-300,
-.light .text-lime-200 {
-  color: #065f46 !important;
-}
-
-.light .bg-rose-400\/10,
-.light .bg-rose-400\/15,
-.light .bg-rose-400\/20 {
-  background-color: #fff1f2 !important;
-  border: 1px solid #fecdd3 !important;
-  color: #9f1239 !important;
-}
-
-.light .text-rose-300,
-.light .text-rose-200 {
-  color: #9f1239 !important;
-}
-
-.light .bg-cyan-400\/10,
-.light .bg-cyan-400\/15,
-.light .bg-cyan-400\/20 {
-  background-color: #f0f9ff !important;
-  border: 1px solid #bae6fd !important;
-  color: #0369a1 !important;
-}
-
-.light .text-cyan-300,
-.light .text-cyan-200 {
-  color: #0369a1 !important;
-}
-
-.light .bg-violet-400\/10,
-.light .bg-violet-400\/15,
-.light .bg-violet-400\/20 {
-  background-color: #f5f3ff !important;
-  border: 1px solid #ddd6fe !important;
-  color: #5b21b6 !important;
-}
-
-.light .text-violet-300,
-.light .text-violet-200 {
-  color: #5b21b6 !important;
-}
-
-/* 8. Star Bullet Rewriter (Light Mode) */
-.light #bullet-studio .bg-violet-400\/15 {
-  background-color: #eff6ff !important;
-  border: 1px solid #bfdbfe !important;
-  color: #1d4ed8 !important;
-}
-
-.light #bullet-studio .bg-black\/50 {
-  background-color: #f8fafc !important;
-  border: 1px solid #e2e8f0 !important;
-}
-
-.light #bullet-studio select {
-  background-color: #ffffff !important;
-  border: 1px solid #cbd5e1 !important;
-  color: #0f172a !important;
-}
-
-.light #bullet-studio button {
-  background-color: #ffffff !important;
-  border: 1px solid #cbd5e1 !important;
-  color: #334155 !important;
-}
-
-.light #bullet-studio button:hover {
-  background-color: #f8fafc !important;
-  border-color: #94a3b8 !important;
-  color: #0f172a !important;
-}
-
-/* 9. Live ATS Resume Preview (Light Mode) */
-.light #printable-resume.bg-slate-950 {
-  background-color: #ffffff !important;
-  color: #0f172a !important;
-  border: 1px solid #e2e8f0 !important;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
-}
-
-.light #printable-resume.bg-slate-950 h4 {
-  color: #0f172a !important;
-}
-
-.light #printable-resume.bg-slate-950 p {
-  color: #475569 !important;
-}
-
-.light #printable-resume.bg-slate-950 section h5 {
-  color: #2563eb !important;
-  border-bottom: 1px solid #e2e8f0 !important;
-}
-
-.light #printable-resume.bg-slate-950 li,
-.light #printable-resume.bg-slate-950 span {
-  color: #334155 !important;
-}
-
-.light #resume-editor .bg-black\/50,
-.light #resume-editor .bg-black\/60 {
-  background-color: #f8fafc !important;
-  border: 1px solid #e2e8f0 !important;
-}
-
-/* 10. Resume Health Section (Light Mode) */
-.light #resume-health .bg-black\/50 {
-  background-color: #f8fafc !important;
-  border: 1px solid #e2e8f0 !important;
-}
-
-.light #resume-health .bg-blue-500\/15 {
-  background-color: #eff6ff !important;
-  border-color: #bfdbfe !important;
-  color: #2563eb !important;
-}
-
-.light #resume-health .text-amber-300 {
-  color: #d97706 !important;
-}
-
-/* 11. Application Tracker (Light Mode) */
-.light #applications .bg-black\/50 {
-  background-color: #f8fafc !important;
-  border: 1px solid #e2e8f0 !important;
-}
-
-.light #applications tr {
-  border-bottom-color: #e2e8f0 !important;
-}
-
-.light #applications tr:hover {
-  background-color: #f8fafc !important;
-}
-
-/* 12. Interview Prep Radar (Light Mode) */
-.light #interview-radar .bg-black\/50,
-.light #interview-radar .bg-white\/\[0\.03\] {
-  background-color: #f8fafc !important;
-  border: 1px solid #e2e8f0 !important;
-}
-
-.light #interview-radar button:hover {
-  background-color: #f1f5f9 !important;
-}
-
-/* 13. Modals & Dialogs (Light Mode) */
-.light [role="dialog"],
-.light [role="dialog"] > div.bg-slate-900 {
-  background-color: #ffffff !important;
-  border: 1px solid #cbd5e1 !important;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1) !important;
-}
-
-.light [role="dialog"] .bg-black\/50 {
-  background-color: #f8fafc !important;
-  border: 1px solid #e2e8f0 !important;
-}
-
-.light [role="dialog"] .text-white {
-  color: #0f172a !important;
-}
-
-.light [role="dialog"] .text-slate-300,
-.light [role="dialog"] .text-slate-400 {
-  color: #64748b !important;
-}
-
-/* 14. Dedicated Studio Modals (Light Mode) */
-.light .jd-modal-surface,
-.light .resume-modal-surface {
-  background-color: #ffffff !important;
-  border: 1px solid #cbd5e1 !important;
-  color: #0f172a !important;
-}
-
-.light .jd-modal-surface .bg-black\/40,
-.light .jd-modal-surface .bg-black\/20,
-.light .resume-modal-surface .bg-black\/40,
-.light .resume-modal-surface .bg-black\/20 {
-  background-color: #f8fafc !important;
-  border-color: #e2e8f0 !important;
-}
-
-.light .jd-modal-textarea,
-.light .resume-modal-textarea {
-  background-color: #ffffff !important;
-  border: 1px solid #cbd5e1 !important;
-  color: #0f172a !important;
-}
-
-.light .jd-modal-textarea:focus {
-  border-color: #2563eb !important;
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12) !important;
-}
-
-.light .resume-modal-textarea:focus {
-  border-color: #0891b2 !important;
-  box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.12) !important;
-}
-
-/* 15. Enhanced Signal Graph (Light Mode) */
-.light .signal-canvas-bg {
-  background-color: #f8fafc !important;
-  border-color: #e2e8f0 !important;
-}
-
-.light .signal-inspector-card {
-  background-color: #f0fdf4 !important;
-  border-color: #bbf7d0 !important;
-}
-
-.light .signal-inspector-card p,
-.light .signal-inspector-card span {
-  color: #1e293b !important;
-}
-

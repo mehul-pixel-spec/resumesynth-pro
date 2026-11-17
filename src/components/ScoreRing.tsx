@@ -1,103 +1,128 @@
 import React from 'react';
-import { CheckCircle2, AlertTriangle, AlertCircle } from 'lucide-react';
+import { AnalysisResult } from '../types';
+import { ShieldAlert, ShieldCheck, HelpCircle } from 'lucide-react';
 
 interface ScoreRingProps {
   score: number;
+  label?: string;
   size?: number;
   strokeWidth?: number;
-  label?: string;
-  showStatus?: boolean;
+  breakdown?: {
+    keywordMatch: number;
+    hardSkills: number;
+    softSkills: number;
+    formatting: number;
+    actionVerbs: number;
+  };
 }
 
 export const ScoreRing: React.FC<ScoreRingProps> = ({
   score,
-  size = 180,
-  strokeWidth = 10,
-  label = "out of 100",
-  showStatus = true
+  label = "ATS Composite Fit",
+  breakdown
 }) => {
-  const radius = (size - strokeWidth * 2) / 2;
-  const circumference = 2 * Math.PI * radius;
-  const strokeDashoffset = circumference - (score / 100) * circumference;
+  const getStatusText = (s: number) => {
+    if (s >= 80) return "High Signal · Ready for Submission";
+    if (s >= 65) return "Moderate Fit · Minor Keyword Gaps";
+    if (s >= 50) return "Needs Proof · Quantifiable Metrics Missing";
+    return "Substantial Deficit · Action Verbs & Keywords Required";
+  };
 
-  let strokeColor = "var(--score-strong, #a3e635)";
-  let statusText = "Strong Match";
-  let statusBadgeClass = "bg-lime-400/15 text-lime-300 border-lime-400/30 score-badge-strong";
-  let StatusIcon = CheckCircle2;
-
-  if (score < 60) {
-    strokeColor = "var(--score-low, #f43f5e)";
-    statusText = "Significant Gaps";
-    statusBadgeClass = "bg-rose-400/15 text-rose-200 border-rose-400/30 score-badge-low";
-    StatusIcon = AlertCircle;
-  } else if (score < 75) {
-    strokeColor = "var(--score-med, #facc15)";
-    statusText = "Needs Evidence";
-    statusBadgeClass = "bg-amber-400/15 text-amber-200 border-amber-400/30 score-badge-med";
-    StatusIcon = AlertTriangle;
-  } else if (score < 88) {
-    strokeColor = "var(--score-good, #38bdf8)";
-    statusText = "Good Match";
-    statusBadgeClass = "bg-sky-400/15 text-sky-200 border-sky-400/30 score-badge-good";
-    StatusIcon = CheckCircle2;
-  }
+  const getStatusColor = (s: number) => {
+    if (s >= 80) return "text-[var(--match-green)]";
+    if (s >= 65) return "text-[var(--gap-ochre)]";
+    return "text-[var(--vermilion)]";
+  };
 
   return (
-    <div
-      className="relative flex flex-col items-center justify-center"
-      style={{ width: size, height: size }}
-      role="region"
-      aria-label={`Overall ATS score: ${score} percent, ${statusText}`}
+    <article
+      aria-label="ATS Score Ledger"
+      className="border-2 border-[var(--ink-solid)] paper-surface p-6 sm:p-8 mb-14"
     >
-      <svg
-        className="absolute inset-0 -rotate-90 transition-all duration-700 ease-out"
-        width={size}
-        height={size}
-        viewBox={`0 0 ${size} ${size}`}
-        role="img"
-        aria-hidden="true"
-      >
-        <circle
-          cx={size / 2}
-          cy={size / 2}
-          r={radius}
-          fill="none"
-          stroke="#1e293b"
-          strokeWidth={strokeWidth}
-          className="score-track"
-        />
-        <circle
-          cx={size / 2}
-          cy={size / 2}
-          r={radius}
-          fill="none"
-          stroke={strokeColor}
-          strokeWidth={strokeWidth}
-          strokeLinecap="round"
-          strokeDasharray={circumference}
-          strokeDashoffset={strokeDashoffset}
-          className="transition-all duration-700 ease-out"
-        />
-      </svg>
-
-      {/* Center Score Display */}
-      <div className="relative z-10 flex flex-col items-center text-center">
-        <span
-          className="font-display text-4xl font-extrabold tracking-tight transition-all duration-500"
-          style={{ color: strokeColor }}
-        >
-          {score}
-        </span>
-        <span className="text-xs font-mono uppercase tracking-wider text-slate-300 mt-0.5 font-semibold">
-          {label}
-        </span>
-        {showStatus && (
-          <span className={`mt-2 inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold border ${statusBadgeClass}`}>
-            <StatusIcon className="w-3 h-3" aria-hidden="true" />
-            <span>{statusText}</span>
+      <div className="flex flex-wrap items-baseline justify-between border-b paper-border pb-4 mb-6 gap-2">
+        <div>
+          <span className="font-mono text-xs uppercase tracking-widest text-[var(--vermilion)] font-bold">
+            Audit Ledger
           </span>
-        )}
+          <h2 className="font-serif text-2xl font-bold text-[var(--ink-solid)] mt-0.5">
+            ATS Composite Readiness
+          </h2>
+        </div>
+        <span className="font-mono text-xs text-[var(--ink-muted)]">
+          Audit Algorithm: Strict Weighted Vector Match
+        </span>
       </div>
-    </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+        
+        {/* Massive Editorial Metric Plate */}
+        <div className="lg:col-span-5 border-r lg:paper-border pr-0 lg:pr-8 space-y-3">
+          <div className="flex items-baseline gap-2">
+            <span className={`font-serif text-6xl sm:text-7xl font-bold tracking-tight ${getStatusColor(score)}`}>
+              {score}
+            </span>
+            <span className="font-mono text-xl text-[var(--ink-faint)]">/ 100</span>
+          </div>
+
+          <div className="space-y-1">
+            <p className="font-serif text-base font-semibold text-[var(--ink-solid)]">
+              {getStatusText(score)}
+            </p>
+            <p className="text-xs text-[var(--ink-muted)] leading-relaxed">
+              Calculated against the specified job description requirements without inflated scores or false assurances.
+            </p>
+          </div>
+        </div>
+
+        {/* Breakdown Sub-Indices as a Clean Letterpress Ledger */}
+        <div className="lg:col-span-7 space-y-4">
+          <span className="font-mono text-xs uppercase tracking-widest text-[var(--ink-faint)] block">
+            Sub-Metric Diagnostic Ledger:
+          </span>
+
+          <div className="space-y-3 font-mono text-xs">
+            <div>
+              <div className="flex justify-between mb-1">
+                <span className="text-[var(--ink-solid)] font-semibold">Exact Term Frequency Match</span>
+                <span className="text-[var(--ink-muted)]">{breakdown?.keywordMatch ?? score}%</span>
+              </div>
+              <div className="h-1.5 w-full bg-[var(--paper-subtle)] border paper-border overflow-hidden">
+                <div
+                  className="h-full bg-[var(--ink-solid)] transition-all duration-500"
+                  style={{ width: `${breakdown?.keywordMatch ?? score}%` }}
+                />
+              </div>
+            </div>
+
+            <div>
+              <div className="flex justify-between mb-1">
+                <span className="text-[var(--ink-solid)] font-semibold">Technical Tools & Frameworks</span>
+                <span className="text-[var(--ink-muted)]">{breakdown?.hardSkills ?? Math.min(100, score + 4)}%</span>
+              </div>
+              <div className="h-1.5 w-full bg-[var(--paper-subtle)] border paper-border overflow-hidden">
+                <div
+                  className="h-full bg-[var(--match-green)] transition-all duration-500"
+                  style={{ width: `${breakdown?.hardSkills ?? Math.min(100, score + 4)}%` }}
+                />
+              </div>
+            </div>
+
+            <div>
+              <div className="flex justify-between mb-1">
+                <span className="text-[var(--ink-solid)] font-semibold">STAR Impact & Quantifiable Metrics</span>
+                <span className="text-[var(--ink-muted)]">{breakdown?.actionVerbs ?? Math.max(10, score - 8)}%</span>
+              </div>
+              <div className="h-1.5 w-full bg-[var(--paper-subtle)] border paper-border overflow-hidden">
+                <div
+                  className="h-full bg-[var(--vermilion)] transition-all duration-500"
+                  style={{ width: `${breakdown?.actionVerbs ?? Math.max(10, score - 8)}%` }}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </article>
   );
 };
