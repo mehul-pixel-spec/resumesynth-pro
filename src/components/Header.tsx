@@ -1,14 +1,16 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { useAuth } from '../auth/AuthContext';
 import { 
   FileText, 
-  SlidersHorizontal, 
-  Layers, 
-  HelpCircle, 
   Sun, 
   Moon, 
   Download, 
   Menu,
-  CheckCircle2
+  CheckCircle2,
+  User,
+  LogOut,
+  Settings,
+  ChevronDown
 } from 'lucide-react';
 
 interface HeaderProps {
@@ -19,6 +21,8 @@ interface HeaderProps {
   isSidebarOpen: boolean;
   activePresetName?: string;
   score?: number;
+  onOpenAuth: (mode: 'login' | 'signup') => void;
+  onOpenSettings: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -28,8 +32,13 @@ export const Header: React.FC<HeaderProps> = ({
   onToggleSidebar,
   isSidebarOpen,
   activePresetName = 'General',
-  score = 0
+  score = 0,
+  onOpenAuth,
+  onOpenSettings
 }) => {
+  const { user, logout } = useAuth();
+  const [isAvatarMenuOpen, setIsAvatarMenuOpen] = useState(false);
+
   return (
     <>
       {/* Skip Link for WCAG Accessibility */}
@@ -100,12 +109,104 @@ export const Header: React.FC<HeaderProps> = ({
             <button
               type="button"
               onClick={onExportClick}
-              className="h-9 px-4 flex items-center gap-2 border border-[var(--ink-solid)] bg-[var(--ink-solid)] text-[var(--paper-bg)] text-xs font-mono uppercase tracking-wider font-semibold hover:opacity-90 active:scale-[0.98] transition cursor-pointer shadow-sm"
+              className="h-9 px-3 sm:px-4 flex items-center gap-2 border paper-border hover:bg-[var(--paper-subtle)] text-[var(--ink-solid)] text-xs font-mono uppercase tracking-wider font-semibold transition cursor-pointer"
               aria-label="Export and print resume"
             >
               <Download className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">Export Folio</span>
+              <span className="hidden sm:inline">Export</span>
             </button>
+
+            {/* STEP 2: AUTH ENTRY POINTS (Top-right of navbar) */}
+            {user ? (
+              /* Logged In: Avatar Menu */
+              <div className="relative">
+                <button
+                  type="button"
+                  onClick={() => setIsAvatarMenuOpen(!isAvatarMenuOpen)}
+                  className="h-9 px-2.5 flex items-center gap-2 border-2 border-[var(--ink-solid)] paper-surface hover:bg-[var(--paper-subtle)] transition cursor-pointer"
+                  aria-expanded={isAvatarMenuOpen}
+                  aria-label="Open user profile menu"
+                >
+                  {user.avatarUrl ? (
+                    <img
+                      src={user.avatarUrl}
+                      alt={user.fullName}
+                      className="w-5 h-5 rounded-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-5 h-5 rounded-full bg-[var(--vermilion)] text-white text-[10px] font-mono font-bold flex items-center justify-center">
+                      {user.fullName ? user.fullName[0].toUpperCase() : 'U'}
+                    </div>
+                  )}
+                  <span className="hidden md:inline font-mono text-xs font-semibold text-[var(--ink-solid)] max-w-[120px] truncate">
+                    {user.fullName || user.email.split('@')[0]}
+                  </span>
+                  <ChevronDown className="w-3 h-3 text-[var(--ink-muted)]" />
+                </button>
+
+                {/* Dropdown Menu */}
+                {isAvatarMenuOpen && (
+                  <div className="absolute right-0 mt-2 w-56 border-2 border-[var(--ink-solid)] paper-surface shadow-xl py-1.5 z-50 font-mono text-xs animate-in fade-in slide-in-from-top-2 duration-150">
+                    <div className="px-3 py-2 border-b paper-border">
+                      <p className="font-serif font-bold text-sm text-[var(--ink-solid)] truncate">
+                        {user.fullName}
+                      </p>
+                      <p className="text-[11px] text-[var(--ink-muted)] truncate">
+                        {user.email}
+                      </p>
+                      <span className="inline-block mt-1 px-1.5 py-0.2 bg-[var(--paper-subtle)] border paper-border text-[9px] uppercase tracking-wider text-[var(--ink-faint)]">
+                        Auth: {user.provider}
+                      </span>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsAvatarMenuOpen(false);
+                        onOpenSettings();
+                      }}
+                      className="w-full px-3 py-2 text-left hover:bg-[var(--paper-subtle)] flex items-center gap-2 text-[var(--ink-solid)] cursor-pointer"
+                    >
+                      <Settings className="w-3.5 h-3.5 text-[var(--ink-muted)]" />
+                      <span>Account Settings</span>
+                    </button>
+
+                    <div className="border-t paper-border my-1" />
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsAvatarMenuOpen(false);
+                        logout();
+                      }}
+                      className="w-full px-3 py-2 text-left hover:bg-[var(--paper-subtle)] text-[var(--vermilion)] flex items-center gap-2 cursor-pointer font-semibold"
+                    >
+                      <LogOut className="w-3.5 h-3.5" />
+                      <span>Log Out</span>
+                    </button>
+                  </div>
+                )}
+              </div>
+            ) : (
+              /* Logged Out: Log in and Primary Sign up */
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => onOpenAuth('login')}
+                  className="h-9 px-3 border paper-border hover:bg-[var(--paper-subtle)] text-[var(--ink-solid)] font-mono text-xs uppercase tracking-wider font-semibold transition cursor-pointer"
+                >
+                  Log In
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => onOpenAuth('signup')}
+                  className="h-9 px-4 bg-[var(--vermilion)] text-white font-mono text-xs uppercase tracking-wider font-bold hover:opacity-95 active:scale-[0.98] transition cursor-pointer shadow-xs"
+                >
+                  Sign Up
+                </button>
+              </div>
+            )}
           </div>
 
         </div>

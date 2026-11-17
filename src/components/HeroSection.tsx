@@ -9,6 +9,7 @@ interface HeroSectionProps {
   onToggleHowItWorks: () => void;
   resumeSnippet?: string;
   score?: number;
+  onOpenSignUp?: () => void;
 }
 
 export const HeroSection: React.FC<HeroSectionProps> = ({
@@ -17,7 +18,8 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
   showHowItWorks,
   onToggleHowItWorks,
   resumeSnippet = "Senior Full-Stack Engineer with 5+ years architecting fault-tolerant microservices, modern React interfaces, and automated CI/CD deployment pipelines.",
-  score = 78
+  score = 78,
+  onOpenSignUp
 }) => {
   return (
     <section aria-labelledby="editorial-headline" className="mb-14 pt-2">
@@ -58,6 +60,23 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
           <p className="text-base sm:text-lg text-[var(--ink-muted)] max-w-xl leading-relaxed">
             Hiring teams do not read generic marketing statements. They scan for verifiable metrics, architecture ownership, and vocabulary match. Resume Synth surfaces the exact gaps between your draft and the job requirements.
           </p>
+
+          {/* Primary Call to Action Bar */}
+          {onOpenSignUp && (
+            <div className="flex flex-wrap items-center gap-3 pt-2">
+              <button
+                type="button"
+                onClick={onOpenSignUp}
+                className="px-6 py-3 bg-[var(--vermilion)] text-white font-mono text-xs uppercase tracking-wider font-bold hover:opacity-95 shadow-sm active:scale-95 transition flex items-center gap-2 cursor-pointer"
+              >
+                <span>Create Candidate Folio</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </button>
+              <span className="font-mono text-xs text-[var(--ink-faint)]">
+                Free initial ATS signal audit · No credit card
+              </span>
+            </div>
+          )}
 
           {/* Interactive Role Presets Selector - Typeset as an index */}
           <div className="pt-2">

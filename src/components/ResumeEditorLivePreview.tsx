@@ -6,15 +6,24 @@ interface ResumeEditorLivePreviewProps {
   onResumeTextChange: (newText: string) => void;
   keywordsToHighlight?: string[];
   onExport: () => void;
+  activeTemplate?: 'editorial' | 'compact' | 'classic';
+  onSelectTemplate?: (tpl: 'editorial' | 'compact' | 'classic') => void;
 }
 
 export const ResumeEditorLivePreview: React.FC<ResumeEditorLivePreviewProps> = ({
   resumeText,
   onResumeTextChange,
   keywordsToHighlight = [],
-  onExport
+  onExport,
+  activeTemplate = 'editorial',
+  onSelectTemplate
 }) => {
-  const [template, setTemplate] = useState<'editorial' | 'compact' | 'classic'>('editorial');
+  const [internalTemplate, setInternalTemplate] = useState<'editorial' | 'compact' | 'classic'>('editorial');
+  const template = onSelectTemplate ? activeTemplate : internalTemplate;
+  const setTemplate = (val: 'editorial' | 'compact' | 'classic') => {
+    if (onSelectTemplate) onSelectTemplate(val);
+    else setInternalTemplate(val);
+  };
   const [copied, setCopied] = useState(false);
 
   const handleCopy = async () => {

@@ -3,6 +3,13 @@ import { PRESETS } from './data/presets';
 import { runAtsAnalysis, detectQualityIssues, generateInterviewQuestions } from './utils/atsEngine';
 import { JobApplication, TailorMode, QualityIssue } from './types';
 
+// Auth System
+import { AuthProvider, useAuth } from './auth/AuthContext';
+import { AuthModal } from './auth/AuthModal';
+import { TermsAcceptanceScreen } from './auth/TermsAcceptanceScreen';
+import { OnboardingScreen } from './auth/OnboardingScreen';
+import { UserSettingsModal } from './auth/UserSettingsModal';
+
 // Components
 import { Header } from './components/Header';
 import { Sidebar } from './components/Sidebar';
@@ -18,9 +25,19 @@ import { InterviewPrepRadar } from './components/InterviewPrepRadar';
 import { ApplicationTracker } from './components/ApplicationTracker';
 import { ExportModal } from './components/ExportModal';
 import { SocialProofAndFaq } from './components/SocialProofAndFaq';
+import { TemplateGallery } from './components/TemplateGallery';
 
-export const App: React.FC = () => {
-  // Theme state with persistence — light paper mode by default
+const MainAppContent: React.FC = () => {
+  const { user, needsTermsReview, needsOnboarding } = useAuth();
+
+  // Auth & Settings Modals
+  const [authModalState, setAuthModalState] = useState<{ isOpen: boolean; mode: 'login' | 'signup' }>({
+    isOpen: false,
+    mode: 'login'
+  });
+  const [isSettingsOpen, setIsSettingsOpen] = useState<boolean>(false);
+
+  // Theme state with persistence
   const [isDark, setIsDark] = useState<boolean>(() => {
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('resumesynth_theme');
@@ -73,6 +90,7 @@ export const App: React.FC = () => {
   const [selectedPresetId, setSelectedPresetId] = useState<string>('backend');
   const activePreset = PRESETS[selectedPresetId] || PRESETS['backend'];
 
+  const [activeTemplate, setActiveTemplate] = useState<'editorial' | 'compact' | 'classic'>('editorial');
   const [jobDescription, setJobDescription] = useState<string>(activePreset.jd);
   const [resumeText, setResumeText] = useState<string>(activePreset.resume);
   const [targetRole, setTargetRole] = useState<string>(activePreset.label);
@@ -80,7 +98,7 @@ export const App: React.FC = () => {
   const [showHowItWorks, setShowHowItWorks] = useState<boolean>(false);
   const [isExportOpen, setIsExportOpen] = useState<boolean>(false);
 
-  // Applications Tracker state — uses types.ts JobApplication exactly
+  // Applications Tracker state
   const [applications, setApplications] = useState<JobApplication[]>([
     {
       id: 'app-1',
@@ -108,17 +126,17 @@ export const App: React.FC = () => {
     }
   ]);
 
-  // Compute live analysis — matches runAtsAnalysis(jd, resume, mode) signature
+  // Compute live analysis
   const analysisResult = useMemo(() => {
     return runAtsAnalysis(jobDescription, resumeText, 'Standard Tailor');
   }, [resumeText, jobDescription]);
 
-  // Compute health issues — detectQualityIssues(resume, analysis, jd)
+  // Compute health issues
   const qualityIssues = useMemo(() => {
     return detectQualityIssues(resumeText, analysisResult, jobDescription);
   }, [resumeText, analysisResult, jobDescription]);
 
-  // Compute interview questions — generateInterviewQuestions(analysis, roleTitle)
+  // Compute interview defense inquiries
   const interviewQuestions = useMemo(() => {
     return generateInterviewQuestions(analysisResult, targetRole);
   }, [analysisResult, targetRole]);
@@ -170,7 +188,7 @@ export const App: React.FC = () => {
   return (
     <div className="min-h-screen flex flex-col transition-colors selection:bg-[var(--vermilion)] selection:text-white">
       
-      {/* Top Masthead */}
+      {/* Top Masthead with Auth Entry Points */}
       <Header
         onExportClick={() => setIsExportOpen(true)}
         isDark={isDark}
@@ -179,6 +197,8 @@ export const App: React.FC = () => {
         isSidebarOpen={isSidebarOpen}
         activePresetName={activePreset.label}
         score={analysisResult.overall}
+        onOpenAuth={(mode) => setAuthModalState({ isOpen: true, mode })}
+        onOpenSettings={() => setIsSettingsOpen(true)}
       />
 
       {/* Slide-out Index Shelf */}
@@ -197,13 +217,14 @@ export const App: React.FC = () => {
       {/* Main Drafting Workspace Canvas */}
       <main id="main-content" className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
         
-        {/* Section 1: Hero & Real-Time Proof Specimen */}
+        {/* Section 1: Hero & Real-Time Proof Specimen with CTA */}
         <HeroSection
           selectedPreset={selectedPresetId}
           onSelectPreset={handleSelectPreset}
           showHowItWorks={showHowItWorks}
           onToggleHowItWorks={() => setShowHowItWorks(!showHowItWorks)}
           score={analysisResult.overall}
+          onOpenSignUp={() => setAuthModalState({ isOpen: true, mode: 'signup' })}
         />
 
         {/* Section 2: Input Corpus Drafting Desk */}
@@ -251,20 +272,28 @@ export const App: React.FC = () => {
           resumeText={resumeText}
         />
 
-        {/* Section 7: Live Typeset Preview */}
+        {/* Section 7: Architectural Templates Gallery with Hover Previews */}
+        <TemplateGallery
+          activeTemplateId={activeTemplate}
+          onSelectTemplate={(tpl) => setActiveTemplate(tpl as any)}
+        />
+
+        {/* Section 8: Live Typeset Preview */}
         <ResumeEditorLivePreview
           resumeText={resumeText}
           onResumeTextChange={setResumeText}
           keywordsToHighlight={analysisResult.matched.map(m => m.term)}
           onExport={() => setIsExportOpen(true)}
+          activeTemplate={activeTemplate}
+          onSelectTemplate={setActiveTemplate}
         />
 
-        {/* Section 8: Interview Cross-Examination */}
+        {/* Section 9: Interview Cross-Examination */}
         <InterviewPrepRadar
           questions={interviewQuestions}
         />
 
-        {/* Section 9: Application Tracker Pipeline */}
+        {/* Section 10: Application Tracker Pipeline */}
         <ApplicationTracker
           applications={applications}
           onAddApplication={handleAddApplication}
@@ -272,7 +301,7 @@ export const App: React.FC = () => {
           onDeleteApplication={handleDeleteApplication}
         />
 
-        {/* Section 10: Social Proof & FAQ */}
+        {/* Section 11: Social Proof & FAQ */}
         <SocialProofAndFaq />
 
       </main>
@@ -286,6 +315,33 @@ export const App: React.FC = () => {
         role={targetRole}
       />
 
+      {/* Auth Entry Modal (Sign Up / Log In / Forgot Password) */}
+      <AuthModal
+        isOpen={authModalState.isOpen}
+        initialMode={authModalState.mode}
+        onClose={() => setAuthModalState({ isOpen: false, mode: 'login' })}
+      />
+
+      {/* STEP 6.1: Mandatory Full-Page Terms & Conditions Gate */}
+      {needsTermsReview && <TermsAcceptanceScreen />}
+
+      {/* STEP 6.3: Post-Login Setup & Onboarding Gate */}
+      {!needsTermsReview && needsOnboarding && <OnboardingScreen />}
+
+      {/* Candidate Profile & Data Privacy Settings Modal */}
+      <UserSettingsModal
+        isOpen={isSettingsOpen}
+        onClose={() => setIsSettingsOpen(false)}
+      />
+
     </div>
+  );
+};
+
+export const App: React.FC = () => {
+  return (
+    <AuthProvider>
+      <MainAppContent />
+    </AuthProvider>
   );
 };
