@@ -12,7 +12,6 @@ import { UserSettingsModal } from './auth/UserSettingsModal';
 
 // Components
 import { Header } from './components/Header';
-import { Sidebar } from './components/Sidebar';
 import { HeroSection } from './components/HeroSection';
 import { InputWorkspace } from './components/InputWorkspace';
 import { ScoreRing } from './components/ScoreRing';
@@ -59,33 +58,16 @@ const MainAppContent: React.FC = () => {
     }
   }, [isDark]);
 
-  // Sidebar state
-  const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(false);
   const [activeSection, setActiveSection] = useState('dashboard');
 
-  // Keyboard shortcut: '[' or Ctrl+B to toggle sidebar
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      const target = e.target as HTMLElement;
-      const isInput = target && (
-        target.tagName === 'INPUT' ||
-        target.tagName === 'TEXTAREA' ||
-        target.tagName === 'SELECT' ||
-        target.isContentEditable
-      );
-
-      if (
-        (e.key === '[' && !isInput && !e.ctrlKey && !e.metaKey && !e.altKey) ||
-        ((e.ctrlKey || e.metaKey) && (e.key.toLowerCase() === 'b' || e.code === 'KeyB') && !e.shiftKey)
-      ) {
-        e.preventDefault();
-        setIsSidebarOpen(prev => !prev);
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []);
+  // Smooth navigation handler across all sections
+  const handleNavigate = (sectionId: string) => {
+    setActiveSection(sectionId);
+    const targetElement = document.getElementById(sectionId);
+    if (targetElement) {
+      targetElement.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
 
   // Preset & Editor State
   const [selectedPresetId, setSelectedPresetId] = useState<string>('backend');
@@ -192,33 +174,20 @@ const MainAppContent: React.FC = () => {
       {/* Animated Editorial Splash Screen */}
       <SplashScreen skipOnSessionRepeat={false} />
 
-      {/* Top Masthead with Auth Entry Points */}
+      {/* Top Header with Zekith-style Dropdowns & Auth */}
       <Header
         onExportClick={() => setIsExportOpen(true)}
         isDark={isDark}
         onToggleTheme={() => setIsDark(!isDark)}
-        onToggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
-        isSidebarOpen={isSidebarOpen}
         activePresetName={activePreset.label}
         score={analysisResult.overall}
+        activeSection={activeSection}
+        onNavigate={handleNavigate}
         onOpenAuth={(mode) => setAuthModalState({ isOpen: true, mode })}
         onOpenSettings={() => setIsSettingsOpen(true)}
       />
 
-      {/* Slide-out Index Shelf */}
-      <Sidebar
-        isOpen={isSidebarOpen}
-        onClose={() => setIsSidebarOpen(false)}
-        activeSection={activeSection}
-        onSelectSection={(id) => {
-          setActiveSection(id);
-          setIsSidebarOpen(false);
-        }}
-        score={analysisResult.overall}
-        unresolvedCount={qualityIssues.length}
-      />
-
-      {/* Main Drafting Workspace Canvas */}
+      {/* Main Drafting Workspace Canvas (Full width, centered with max-w-7xl) */}
       <main id="main-content" className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
         
         {/* Section 1: Hero & Real-Time Proof Specimen with CTA */}
@@ -244,16 +213,18 @@ const MainAppContent: React.FC = () => {
         />
 
         {/* Section 3: Diagnostic Composite Ledger */}
-        <ScoreRing
-          score={analysisResult.overall}
-          breakdown={{
-            keywordMatch: Math.round((analysisResult.matched.length / Math.max(1, analysisResult.matched.length + analysisResult.missing.length)) * 100),
-            hardSkills: analysisResult.skills.score,
-            softSkills: 88,
-            formatting: analysisResult.format.score,
-            actionVerbs: analysisResult.verbs.score
-          }}
-        />
+        <div id="dashboard">
+          <ScoreRing
+            score={analysisResult.overall}
+            breakdown={{
+              keywordMatch: Math.round((analysisResult.matched.length / Math.max(1, analysisResult.matched.length + analysisResult.missing.length)) * 100),
+              hardSkills: analysisResult.skills.score,
+              softSkills: 88,
+              formatting: analysisResult.format.score,
+              actionVerbs: analysisResult.verbs.score
+            }}
+          />
+        </div>
 
         {/* Section 4: Vocabulary Matrix & Gap Audit */}
         <div id="vocabulary-matrix">
@@ -326,10 +297,10 @@ const MainAppContent: React.FC = () => {
         onClose={() => setAuthModalState({ isOpen: false, mode: 'login' })}
       />
 
-      {/* STEP 6.1: Mandatory Full-Page Terms & Conditions Gate */}
+      {/* Mandatory Full-Page Terms & Conditions Gate */}
       {needsTermsReview && <TermsAcceptanceScreen />}
 
-      {/* STEP 6.3: Post-Login Setup & Onboarding Gate */}
+      {/* Post-Login Setup & Onboarding Gate */}
       {!needsTermsReview && needsOnboarding && <OnboardingScreen />}
 
       {/* Candidate Profile & Data Privacy Settings Modal */}
