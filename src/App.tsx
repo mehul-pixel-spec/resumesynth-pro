@@ -26,6 +26,7 @@ import { ApplicationTracker } from './components/ApplicationTracker';
 import { ExportModal } from './components/ExportModal';
 import { SocialProofAndFaq } from './components/SocialProofAndFaq';
 import { TemplateGallery } from './components/TemplateGallery';
+import { SplashScreen } from './components/ui/SplashScreen';
 
 const MainAppContent: React.FC = () => {
   const { user, needsTermsReview, needsOnboarding } = useAuth();
@@ -188,6 +189,9 @@ const MainAppContent: React.FC = () => {
   return (
     <div className="min-h-screen flex flex-col transition-colors selection:bg-[var(--vermilion)] selection:text-white">
       
+      {/* Animated Editorial Splash Screen */}
+      <SplashScreen skipOnSessionRepeat={false} />
+
       {/* Top Masthead with Auth Entry Points */}
       <Header
         onExportClick={() => setIsExportOpen(true)}
