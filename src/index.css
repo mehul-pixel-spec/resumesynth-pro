@@ -73,6 +73,27 @@
   border-radius: 2px;
 }
 
+/* Global text selection — soft blue, editorial feel */
+:root {
+  --selection-bg: rgba(59, 130, 246, 0.24);
+  --selection-text: var(--ink-solid);
+}
+
+.dark {
+  --selection-bg: rgba(96, 165, 250, 0.32);
+  --selection-text: #ffffff;
+}
+
+::selection {
+  background-color: var(--selection-bg);
+  color: var(--selection-text);
+}
+
+::-moz-selection {
+  background-color: var(--selection-bg);
+  color: var(--selection-text);
+}
+
 /* Reduced Motion respect */
 @media (prefers-reduced-motion: reduce) {
   *, ::before, ::after {

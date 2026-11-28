@@ -98,5 +98,63 @@ export interface JobApplication {
   notes?: string;
 }
 
+// Resume Template Audit types
+export type SupportedResumeFormat = 'pdf' | 'docx' | 'txt' | 'md';
+export type TemplateAuditCategory =
+  | 'parsing_safety'
+  | 'content_structure'
+  | 'section_detection'
+  | 'role_alignment'
+  | 'market_readiness'
+  | 'contact_info'
+  | 'formatting_quality';
+
+export type TemplateAuditSeverity = 'high' | 'medium' | 'low';
+export type TemplateAuditConfidence = 'high' | 'medium' | 'low';
+export type TemplateAuditActionability = 'quick_fix' | 'manual_review' | 'needs_user_input';
+
+export interface UploadedResumeTemplate {
+  file: File;
+  format: SupportedResumeFormat;
+  name: string;
+  size: number;
+  extractedText: string;
+  extractionMethod: 'direct' | 'mammoth' | 'pdfjs' | 'failed' | 'manual';
+  extractionNote?: string;
+}
+
+export interface TemplateAuditIssue {
+  id: string;
+  severity: TemplateAuditSeverity;
+  category: TemplateAuditCategory;
+  title: string;
+  evidence: string;
+  recommendation: string;
+  rationale: string;
+  actionability: TemplateAuditActionability;
+  confidence: TemplateAuditConfidence;
+}
+
+export interface TemplateAuditCategoryScore {
+  category: TemplateAuditCategory;
+  score: number;
+  maxScore: number;
+  label: string;
+  explanation: string;
+}
+
+export interface TemplateAuditResult {
+  overallReadiness: number;
+  categoryScores: TemplateAuditCategoryScore[];
+  issues: TemplateAuditIssue[];
+  extractedText: string;
+  wordCount: number;
+  characterCount: number;
+  detectedSections: string[];
+  missingSections: string[];
+  roleAlignmentScore: number;
+  roleAlignmentExplanation: string;
+}
+
 export type PreviewTemplate = 'modern' | 'minimal' | 'ats_classic' | 'executive';
 export type TailorMode = 'Standard Tailor' | 'Technical Role' | 'Fresher / Campus' | 'Data / AI Role' | 'Management / Lead';

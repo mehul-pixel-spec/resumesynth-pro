@@ -1,7 +1,8 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useContext, createContext } from 'react';
+import { RouterProvider, createBrowserRouter, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { PRESETS } from './data/presets';
 import { runAtsAnalysis, detectQualityIssues, generateInterviewQuestions } from './utils/atsEngine';
-import { JobApplication, TailorMode, QualityIssue } from './types';
+import { JobApplication, UploadedResumeTemplate } from './types';
 
 // Auth System
 import { AuthProvider, useAuth } from './auth/AuthContext';
@@ -12,7 +13,6 @@ import { UserSettingsModal } from './auth/UserSettingsModal';
 
 // Components
 import { Header } from './components/Header';
-import { Sidebar } from './components/Sidebar';
 import { HeroSection } from './components/HeroSection';
 import { InputWorkspace } from './components/InputWorkspace';
 import { ScoreRing } from './components/ScoreRing';
@@ -26,17 +26,222 @@ import { ApplicationTracker } from './components/ApplicationTracker';
 import { ExportModal } from './components/ExportModal';
 import { SocialProofAndFaq } from './components/SocialProofAndFaq';
 import { TemplateGallery } from './components/TemplateGallery';
+import { ResumeTemplateAudit } from './components/ResumeTemplateAudit';
 import { SplashScreen } from './components/ui/SplashScreen';
 
+// Page Components
+import { HomePage } from './pages/HomePage';
+import { WorkspacePage } from './pages/WorkspacePage';
+import { DashboardPage } from './pages/DashboardPage';
+import { OptimizePage } from './pages/OptimizePage';
+import { TemplatesPage } from './pages/TemplatesPage';
+import { PreviewPage } from './pages/PreviewPage';
+import { InterviewPrepPage } from './pages/InterviewPrepPage';
+import { ApplicationsPage } from './pages/ApplicationsPage';
+import { NotFoundPage } from './pages/NotFoundPage';
+
+// App Shell
+import { AppShell } from './app/AppShell';
+
+// Context for sharing state across routes
+interface AppContextType {
+  // Preset & Editor State
+  selectedPresetId: string;
+  setSelectedPresetId: (id: string) => void;
+  activePreset: any;
+  jobDescription: string;
+  setJobDescription: (text: string) => void;
+  resumeText: string;
+  setResumeText: (updater: string | ((prev: string) => string)) => void;
+  targetRole: string;
+  setTargetRole: (text: string) => void;
+  onRunAnalysis: () => void;
+  isAnalyzing: boolean;
+  // Analysis Results
+  analysisResult: any;
+  qualityIssues: any[];
+  interviewQuestions: any[];
+  // Template State
+  activeTemplate: 'editorial' | 'compact' | 'classic';
+  setActiveTemplate: (id: string) => void;
+  // Resume Template Audit
+  uploadedTemplate: UploadedResumeTemplate | null;
+  setUploadedTemplate: (template: UploadedResumeTemplate | null) => void;
+  onImportResume: (text: string) => void;
+  // Applications Tracker
+  applications: JobApplication[];
+  setApplications: React.Dispatch<React.SetStateAction<JobApplication[]>>;
+  onAddApplication: (newApp: Omit<JobApplication, 'id'>) => void;
+  onUpdateAppStatus: (id: string, status: JobApplication['status']) => void;
+  onDeleteApplication: (id: string) => void;
+  // UI State
+  isDark: boolean;
+  setIsDark: (dark: boolean) => void;
+  isExportOpen: boolean;
+  setIsExportOpen: (open: boolean) => void;
+  showHowItWorks: boolean;
+  setShowHowItWorks: (show: boolean) => void;
+  authModalState: { isOpen: boolean; mode: 'login' | 'signup' };
+  setAuthModalState: React.Dispatch<React.SetStateAction<{ isOpen: boolean; mode: 'login' | 'signup' }>>;
+  isSettingsOpen: boolean;
+  setIsSettingsOpen: (open: boolean) => void;
+  onOpenAuth: (mode: 'login' | 'signup') => void;
+  onOpenSettings: () => void;
+}
+
+const AppContext = createContext<AppContextType | null>(null);
+
+export const useAppContext = () => {
+  const context = useContext(AppContext);
+  if (!context) {
+    throw new Error('useAppContext must be used within AppProvider');
+  }
+  return context;
+};
+
+// Page wrapper components that consume context
+const HomePageWrapper: React.FC = () => {
+  const ctx = useAppContext();
+  return (
+    <HomePage
+      selectedPresetId={ctx.selectedPresetId}
+      onSelectPreset={ctx.setSelectedPresetId}
+      score={ctx.analysisResult?.overall || 0}
+      onOpenSignUp={() => ctx.onOpenAuth('signup')}
+      showHowItWorks={ctx.showHowItWorks}
+      onToggleHowItWorks={() => ctx.setShowHowItWorks(!ctx.showHowItWorks)}
+    />
+  );
+};
+
+const WorkspacePageWrapper: React.FC = () => {
+  const ctx = useAppContext();
+  return (
+    <WorkspacePage
+      selectedPresetId={ctx.selectedPresetId}
+      activePreset={ctx.activePreset}
+      jobDescription={ctx.jobDescription}
+      onJobDescriptionChange={ctx.setJobDescription}
+      resumeText={ctx.resumeText}
+      onResumeChange={ctx.setResumeText}
+      targetRole={ctx.targetRole}
+      onTargetRoleChange={ctx.setTargetRole}
+      onRunAnalysis={ctx.onRunAnalysis}
+      isAnalyzing={ctx.isAnalyzing}
+      analysisResult={ctx.analysisResult}
+      qualityIssues={ctx.qualityIssues}
+      interviewQuestions={ctx.interviewQuestions}
+      activeTemplate={ctx.activeTemplate}
+      onSelectTemplate={ctx.setActiveTemplate}
+      uploadedTemplate={ctx.uploadedTemplate}
+      onImportResume={ctx.onImportResume}
+      applications={ctx.applications}
+      onAddApplication={ctx.onAddApplication}
+      onUpdateAppStatus={ctx.onUpdateAppStatus}
+      onDeleteApplication={ctx.onDeleteApplication}
+    />
+  );
+};
+
+const DashboardPageWrapper: React.FC = () => {
+  const ctx = useAppContext();
+  return (
+    <DashboardPage
+      analysisResult={ctx.analysisResult}
+      qualityIssues={ctx.qualityIssues}
+      interviewQuestions={ctx.interviewQuestions}
+      resumeText={ctx.resumeText}
+      onApplyFix={ctx.setResumeText}
+    />
+  );
+};
+
+const OptimizePageWrapper: React.FC = () => {
+  const ctx = useAppContext();
+  return (
+    <OptimizePage
+      analysisResult={ctx.analysisResult}
+      qualityIssues={ctx.qualityIssues}
+      resumeText={ctx.resumeText}
+      onResumeChange={ctx.setResumeText}
+    />
+  );
+};
+
+const TemplatesPageWrapper: React.FC = () => {
+  const ctx = useAppContext();
+  return (
+    <TemplatesPage
+      activeTemplate={ctx.activeTemplate}
+      onSelectTemplate={ctx.setActiveTemplate}
+    />
+  );
+};
+
+const PreviewPageWrapper: React.FC = () => {
+  const ctx = useAppContext();
+  return (
+    <PreviewPage
+      resumeText={ctx.resumeText}
+      onResumeTextChange={ctx.setResumeText}
+      analysisResult={ctx.analysisResult}
+      activeTemplate={ctx.activeTemplate}
+      onSelectTemplate={ctx.setActiveTemplate}
+      onExport={() => ctx.setIsExportOpen(true)}
+    />
+  );
+};
+
+const InterviewPrepPageWrapper: React.FC = () => {
+  const ctx = useAppContext();
+  return (
+    <InterviewPrepPage
+      interviewQuestions={ctx.interviewQuestions}
+    />
+  );
+};
+
+const ApplicationsPageWrapper: React.FC = () => {
+  const ctx = useAppContext();
+  return (
+    <ApplicationsPage
+      applications={ctx.applications}
+      onAddApplication={ctx.onAddApplication}
+      onUpdateAppStatus={ctx.onUpdateAppStatus}
+      onDeleteApplication={ctx.onDeleteApplication}
+    />
+  );
+};
+
+// Inner router component that uses hooks inside router context
+const RouterInner: React.FC = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const activeRoute = location.pathname === '/' ? '/' : location.pathname.replace(/^\//, '');
+  const { isDark, setIsDark, activePreset, analysisResult, isExportOpen, setIsExportOpen, onOpenAuth, onOpenSettings } = useAppContext();
+
+  const handleNavigate = (route: string) => {
+    navigate(route);
+  };
+
+  return (
+    <AppShell
+      onExportClick={() => setIsExportOpen(true)}
+      isDark={isDark}
+      onToggleTheme={() => setIsDark(!isDark)}
+      activePresetName={activePreset.label}
+      score={analysisResult.overall}
+      activeRoute={activeRoute}
+      onNavigate={handleNavigate}
+      onOpenAuth={onOpenAuth}
+      onOpenSettings={onOpenSettings}
+    />
+  );
+};
+
+// Main App Content with Router
 const MainAppContent: React.FC = () => {
   const { user, needsTermsReview, needsOnboarding } = useAuth();
-
-  // Auth & Settings Modals
-  const [authModalState, setAuthModalState] = useState<{ isOpen: boolean; mode: 'login' | 'signup' }>({
-    isOpen: false,
-    mode: 'login'
-  });
-  const [isSettingsOpen, setIsSettingsOpen] = useState<boolean>(false);
 
   // Theme state with persistence
   const [isDark, setIsDark] = useState<boolean>(() => {
@@ -59,34 +264,6 @@ const MainAppContent: React.FC = () => {
     }
   }, [isDark]);
 
-  // Sidebar state
-  const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(false);
-  const [activeSection, setActiveSection] = useState('dashboard');
-
-  // Keyboard shortcut: '[' or Ctrl+B to toggle sidebar
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      const target = e.target as HTMLElement;
-      const isInput = target && (
-        target.tagName === 'INPUT' ||
-        target.tagName === 'TEXTAREA' ||
-        target.tagName === 'SELECT' ||
-        target.isContentEditable
-      );
-
-      if (
-        (e.key === '[' && !isInput && !e.ctrlKey && !e.metaKey && !e.altKey) ||
-        ((e.ctrlKey || e.metaKey) && (e.key.toLowerCase() === 'b' || e.code === 'KeyB') && !e.shiftKey)
-      ) {
-        e.preventDefault();
-        setIsSidebarOpen(prev => !prev);
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []);
-
   // Preset & Editor State
   const [selectedPresetId, setSelectedPresetId] = useState<string>('backend');
   const activePreset = PRESETS[selectedPresetId] || PRESETS['backend'];
@@ -96,8 +273,9 @@ const MainAppContent: React.FC = () => {
   const [resumeText, setResumeText] = useState<string>(activePreset.resume);
   const [targetRole, setTargetRole] = useState<string>(activePreset.label);
   const [isAnalyzing, setIsAnalyzing] = useState<boolean>(false);
-  const [showHowItWorks, setShowHowItWorks] = useState<boolean>(false);
-  const [isExportOpen, setIsExportOpen] = useState<boolean>(false);
+
+  // Resume Template Audit state
+  const [uploadedTemplate, setUploadedTemplate] = useState<UploadedResumeTemplate | null>(null);
 
   // Applications Tracker state
   const [applications, setApplications] = useState<JobApplication[]>([
@@ -126,6 +304,15 @@ const MainAppContent: React.FC = () => {
       dateAdded: '2026-11-08'
     }
   ]);
+
+  // UI State
+  const [isExportOpen, setIsExportOpen] = useState<boolean>(false);
+  const [showHowItWorks, setShowHowItWorks] = useState<boolean>(false);
+  const [authModalState, setAuthModalState] = useState<{ isOpen: boolean; mode: 'login' | 'signup' }>({
+    isOpen: false,
+    mode: 'login'
+  });
+  const [isSettingsOpen, setIsSettingsOpen] = useState<boolean>(false);
 
   // Compute live analysis
   const analysisResult = useMemo(() => {
@@ -159,17 +346,6 @@ const MainAppContent: React.FC = () => {
     }, 600);
   };
 
-  const handleAddKeywordToResume = (keyword: string) => {
-    setResumeText(prev => {
-      if (prev.includes(keyword)) return prev;
-      return `${prev.trim()}\n- Proven experience utilizing ${keyword} in high-throughput production environments.`;
-    });
-  };
-
-  const handleApplyBullet = (newBullet: string) => {
-    setResumeText(prev => `${prev.trim()}\n- ${newBullet}`);
-  };
-
   const handleAddApplication = (newApp: Omit<JobApplication, 'id'>) => {
     const item: JobApplication = {
       ...newApp,
@@ -186,129 +362,120 @@ const MainAppContent: React.FC = () => {
     setApplications(prev => prev.filter(a => a.id !== id));
   };
 
+  const handleImportResume = (text: string) => {
+    setResumeText(text);
+  };
+
+  const handleOpenAuth = (mode: 'login' | 'signup') => {
+    setAuthModalState({ isOpen: true, mode });
+  };
+
+  const handleOpenSettings = () => {
+    setIsSettingsOpen(true);
+  };
+
+  // Create router with all routes
+  const router = useMemo(() => {
+    return createBrowserRouter([
+      {
+        element: (
+          <AppContext.Provider
+            value={{
+              selectedPresetId,
+              setSelectedPresetId,
+              activePreset,
+              jobDescription,
+              setJobDescription,
+              resumeText,
+              setResumeText,
+              targetRole,
+              setTargetRole,
+              onRunAnalysis: handleRunAnalysis,
+              isAnalyzing,
+              analysisResult,
+              qualityIssues,
+              interviewQuestions,
+              activeTemplate,
+              setActiveTemplate: (id: string) => setActiveTemplate(id as 'editorial' | 'compact' | 'classic'),
+              uploadedTemplate,
+              setUploadedTemplate,
+              onImportResume: handleImportResume,
+              applications,
+              setApplications,
+              onAddApplication: handleAddApplication,
+              onUpdateAppStatus: handleUpdateAppStatus,
+              onDeleteApplication: handleDeleteApplication,
+              isDark,
+              setIsDark,
+              isExportOpen,
+              setIsExportOpen,
+              showHowItWorks,
+              setShowHowItWorks,
+              authModalState,
+              setAuthModalState,
+              isSettingsOpen,
+              setIsSettingsOpen,
+              onOpenAuth: handleOpenAuth,
+              onOpenSettings: handleOpenSettings
+            }}
+          >
+            <RouterInner />
+          </AppContext.Provider>
+        ),
+        children: [
+          {
+            index: true,
+            element: <HomePageWrapper />,
+          },
+          {
+            path: 'workspace',
+            element: <WorkspacePageWrapper />,
+          },
+          {
+            path: 'dashboard',
+            element: <DashboardPageWrapper />,
+          },
+          {
+            path: 'optimize',
+            element: <OptimizePageWrapper />,
+          },
+          {
+            path: 'templates',
+            element: <TemplatesPageWrapper />,
+          },
+          {
+            path: 'preview',
+            element: <PreviewPageWrapper />,
+          },
+          {
+            path: 'interview-prep',
+            element: <InterviewPrepPageWrapper />,
+          },
+          {
+            path: 'applications',
+            element: <ApplicationsPageWrapper />,
+          },
+          {
+            path: '*',
+            element: <NotFoundPage />,
+          },
+        ],
+      },
+    ]);
+  }, [
+    selectedPresetId, activePreset, jobDescription, resumeText, targetRole,
+    isAnalyzing, analysisResult, qualityIssues, interviewQuestions,
+    activeTemplate, uploadedTemplate, applications,
+    isDark, isExportOpen, showHowItWorks, authModalState, isSettingsOpen
+  ]);
+
   return (
     <div className="min-h-screen flex flex-col transition-colors selection:bg-[var(--vermilion)] selection:text-white">
-      
       {/* Animated Editorial Splash Screen */}
       <SplashScreen skipOnSessionRepeat={false} />
 
-      {/* Top Masthead with Auth Entry Points */}
-      <Header
-        onExportClick={() => setIsExportOpen(true)}
-        isDark={isDark}
-        onToggleTheme={() => setIsDark(!isDark)}
-        onToggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
-        isSidebarOpen={isSidebarOpen}
-        activePresetName={activePreset.label}
-        score={analysisResult.overall}
-        onOpenAuth={(mode) => setAuthModalState({ isOpen: true, mode })}
-        onOpenSettings={() => setIsSettingsOpen(true)}
-      />
-
-      {/* Slide-out Index Shelf */}
-      <Sidebar
-        isOpen={isSidebarOpen}
-        onClose={() => setIsSidebarOpen(false)}
-        activeSection={activeSection}
-        onSelectSection={(id) => {
-          setActiveSection(id);
-          setIsSidebarOpen(false);
-        }}
-        score={analysisResult.overall}
-        unresolvedCount={qualityIssues.length}
-      />
-
-      {/* Main Drafting Workspace Canvas */}
-      <main id="main-content" className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
-        
-        {/* Section 1: Hero & Real-Time Proof Specimen with CTA */}
-        <HeroSection
-          selectedPreset={selectedPresetId}
-          onSelectPreset={handleSelectPreset}
-          showHowItWorks={showHowItWorks}
-          onToggleHowItWorks={() => setShowHowItWorks(!showHowItWorks)}
-          score={analysisResult.overall}
-          onOpenSignUp={() => setAuthModalState({ isOpen: true, mode: 'signup' })}
-        />
-
-        {/* Section 2: Input Corpus Drafting Desk */}
-        <InputWorkspace
-          jobDescription={jobDescription}
-          onJobDescriptionChange={setJobDescription}
-          resumeText={resumeText}
-          onResumeChange={setResumeText}
-          targetRole={targetRole}
-          onTargetRoleChange={setTargetRole}
-          onRunAnalysis={handleRunAnalysis}
-          isAnalyzing={isAnalyzing}
-        />
-
-        {/* Section 3: Diagnostic Composite Ledger */}
-        <ScoreRing
-          score={analysisResult.overall}
-          breakdown={{
-            keywordMatch: Math.round((analysisResult.matched.length / Math.max(1, analysisResult.matched.length + analysisResult.missing.length)) * 100),
-            hardSkills: analysisResult.skills.score,
-            softSkills: 88,
-            formatting: analysisResult.format.score,
-            actionVerbs: analysisResult.verbs.score
-          }}
-        />
-
-        {/* Section 4: Vocabulary Matrix & Gap Audit */}
-        <div id="vocabulary-matrix">
-          <VocabularyGapMap
-            analysis={analysisResult}
-            onAddKeyword={handleAddKeywordToResume}
-          />
-        </div>
-
-        {/* Section 5: STAR Bullet Rewriter */}
-        <StarBulletOptimizer
-          analysis={analysisResult}
-          onApplyBullet={handleApplyBullet}
-        />
-
-        {/* Section 6: Quality & Health Audit */}
-        <ResumeHealthSection
-          issues={qualityIssues}
-          onApplyFix={(fixed) => setResumeText(fixed)}
-          resumeText={resumeText}
-        />
-
-        {/* Section 7: Architectural Templates Gallery with Hover Previews */}
-        <TemplateGallery
-          activeTemplateId={activeTemplate}
-          onSelectTemplate={(tpl) => setActiveTemplate(tpl as any)}
-        />
-
-        {/* Section 8: Live Typeset Preview */}
-        <ResumeEditorLivePreview
-          resumeText={resumeText}
-          onResumeTextChange={setResumeText}
-          keywordsToHighlight={analysisResult.matched.map(m => m.term)}
-          onExport={() => setIsExportOpen(true)}
-          activeTemplate={activeTemplate}
-          onSelectTemplate={setActiveTemplate}
-        />
-
-        {/* Section 9: Interview Cross-Examination */}
-        <InterviewPrepRadar
-          questions={interviewQuestions}
-        />
-
-        {/* Section 10: Application Tracker Pipeline */}
-        <ApplicationTracker
-          applications={applications}
-          onAddApplication={handleAddApplication}
-          onUpdateStatus={handleUpdateAppStatus}
-          onDeleteApplication={handleDeleteApplication}
-        />
-
-        {/* Section 11: Social Proof & FAQ */}
-        <SocialProofAndFaq />
-
-      </main>
+      {/* Router Provider */}
+      <RouterProvider router={router} />
 
       {/* Export Modal */}
       <ExportModal
@@ -337,12 +504,11 @@ const MainAppContent: React.FC = () => {
         isOpen={isSettingsOpen}
         onClose={() => setIsSettingsOpen(false)}
       />
-
     </div>
   );
 };
 
-export const App: React.FC = () => {
+export const AppRouter: React.FC = () => {
   return (
     <AuthProvider>
       <MainAppContent />
